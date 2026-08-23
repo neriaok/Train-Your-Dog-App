@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts, Heebo_400Regular, Heebo_500Medium, Heebo_600SemiBold, Heebo_700Bold, Heebo_800ExtraBold } from '@expo-google-fonts/heebo';
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View } from 'react-native';
 
 import { LEVELS } from './src/data';
@@ -15,11 +16,15 @@ SplashScreen.preventAutoHideAsync();
 
 type Screen = 'splash' | 'levels' | 'step' | 'success';
 
+const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('splash');
   const [levelId, setLevelId] = useState(1);
   const [stepIdx, setStepIdx] = useState(0);
   const [completed, setCompleted] = useState<number[]>([]);
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const hasLoadedProgress = useRef(false);
 
   const [fontsLoaded] = useFonts({
     Heebo_400Regular,
@@ -29,11 +34,30 @@ export default function App() {
     Heebo_800ExtraBold,
   });
 
+  useEffect(() => {
+    AsyncStorage.getItem(COMPLETED_LEVELS_KEY)
+      .then(stored => {
+        if (stored) setCompleted(JSON.parse(stored));
+      })
+      .finally(() => setProgressLoaded(true));
+  }, []);
+
+  useEffect(() => {
+    // Skip the very first write so we don't clobber storage with the
+    // initial empty array before the loaded progress has been applied.
+    if (!progressLoaded) return;
+    if (!hasLoadedProgress.current) {
+      hasLoadedProgress.current = true;
+      return;
+    }
+    AsyncStorage.setItem(COMPLETED_LEVELS_KEY, JSON.stringify(completed));
+  }, [completed, progressLoaded]);
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) await SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded || !progressLoaded) return null;
 
   const level = LEVELS.find(l => l.id === levelId)!;
   const step = level?.steps[stepIdx];
