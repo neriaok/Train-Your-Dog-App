@@ -85,11 +85,11 @@ DogTrainingApp/
 }
 ```
 
-## Assets נדרשים
+## Assets
 
-הנח בתיקיית `assets/`:
+בתיקיית `assets/` יש כרגע placeholder פשוט (עיגול על רקע כתום) בשלושת הקבצים הנדרשים:
 - `icon.png` - 1024x1024px
 - `splash.png` - 1284x2778px
 - `adaptive-icon.png` - 1024x1024px (אנדרואיד)
 
-אפשר להשתמש ב-Figma או Canva לייצור ה-assets.
+לפני פרסום לחנויות יש להחליף אותם בעיצוב אמיתי (למשל מ-Figma או Canva) - בלי זה ה-build ירוץ אבל האייקון ומסך הפתיחה ייראו גנריים.
