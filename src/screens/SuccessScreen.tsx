@@ -24,7 +24,7 @@ export default function SuccessScreen({ level, isLast, onNext, onRestart }: Prop
 
   const nextLevel = LEVELS.find(l => l.id === level.id + 1);
   const successPose =
-    level.id === 2 ? 'crate_full' : level.id === 3 ? 'leave_walk' : 'sit';
+    level.id === 2 ? 'crate_full' : level.id === 3 ? 'leave_walk' : level.id === 4 ? 'walk_stay' : 'sit';
 
   useEffect(() => {
     Animated.parallel([

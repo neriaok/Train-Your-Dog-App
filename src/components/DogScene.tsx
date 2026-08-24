@@ -10,13 +10,18 @@ const collarColors: Record<IllustrationKey, string> = {
   sit: '#FF6B35', come: '#FF6B35', down: '#FF6B35',
   crate_enter: '#2EC4B6', crate_return: '#2EC4B6', crate_full: '#2EC4B6',
   leave_close: '#9B5DE5', leave_back: '#9B5DE5', leave_walk: '#9B5DE5',
+  walk_pull: '#06D6A0', walk_sit: '#06D6A0', walk_stay: '#06D6A0',
 };
 
 const bubbleTexts: Record<IllustrationKey, string> = {
   sit: 'שב!', come: 'אליי!', down: 'ארצה!',
   crate_enter: 'מקום!', crate_return: 'אליי! מקום!', crate_full: 'מקום!',
   leave_close: 'עזוב!', leave_back: 'עזוב!', leave_walk: 'עזוב!',
+  walk_pull: 'לידי!', walk_sit: 'שב!', walk_stay: 'הישאר!',
 };
+
+// Leash color, shared by all walk_* poses
+const LEASH_COLOR = '#8B6340';
 
 function DogSit({ col, wag }: { col: string; wag: number }) {
   return (
@@ -293,8 +298,122 @@ function DogLeaveWalk({ col, wag }: { col: string; wag: number }) {
   );
 }
 
+function DogWalkPull({ col, wag }: { col: string; wag: number }) {
+  return (
+    <G>
+      {/* Taut leash - drawn first so the dog sits on top of it */}
+      <Line x1="90" y1="158" x2="200" y2="112" stroke={LEASH_COLOR} strokeWidth="2.5" strokeLinecap="round" />
+      <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
+      <Ellipse cx="106" cy="168" rx="28" ry="14" fill="#D4A055" rotation="-12" originX="106" originY="168" />
+      <Rect x="80" y="170" width="11" height="24" rx="5" fill="#D4A055" rotation="-25" originX="84" originY="170" />
+      <Rect x="96" y="173" width="11" height="22" rx="5" fill="#C89040" rotation="12" originX="100" originY="173" />
+      <Rect x="114" y="170" width="11" height="22" rx="5" fill="#D4A055" rotation="22" originX="118" originY="170" />
+      <Rect x="128" y="168" width="11" height="22" rx="5" fill="#C08030" rotation="-8" originX="132" originY="168" />
+      <Ellipse cx="74" cy="196" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="104" cy="198" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="128" cy="196" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="86" cy="155" rx="14" ry="10" fill="#D4A055" />
+      <Rect x="74" y="158" width="24" height="6" rx="3" fill={col} />
+      <Circle cx="86" cy="161" r="2.5" fill="#FFD166" />
+      <Ellipse cx="72" cy="142" rx="21" ry="19" fill="#D4A055" />
+      <Ellipse cx="65" cy="138" rx="11" ry="8" fill="#EEC070" opacity="0.5" />
+      <Ellipse cx="56" cy="143" rx="8" ry="13" fill="#C08030" rotation="28" originX="56" originY="143" />
+      <Ellipse cx="88" cy="139" rx="8" ry="12" fill="#C08030" rotation="-12" originX="88" originY="139" />
+      <Ellipse cx="54" cy="150" rx="11" ry="8" fill="#C89040" />
+      <Ellipse cx="51" cy="147" rx="6" ry="5" fill="#DCAA5A" />
+      <Ellipse cx="51" cy="145" rx="5" ry="3.5" fill="#2C1810" />
+      <Circle cx="64" cy="136" r="5" fill="#2C1810" />
+      <Circle cx="79" cy="135" r="5" fill="#2C1810" />
+      <Circle cx="62.5" cy="134.5" r="1.8" fill="white" />
+      <Circle cx="77.5" cy="133.5" r="1.8" fill="white" />
+      <Path d="M47 152 Q51 161 49 166 Q53 171 57 166 Q55 161 59 152" fill="#D4608A" />
+      <G rotation={wag} originX="132" originY="163">
+        <Path d="M132 163 Q150 141 154 122" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M132 163 Q150 141 154 122" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
+      {/* "Turn around" cue */}
+      <Path d="M258 188 Q274 176 258 164" stroke={col} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <Polygon points="253,167 262,162 262,173" fill={col} />
+    </G>
+  );
+}
+
+function DogWalkSit({ col, wag }: { col: string; wag: number }) {
+  return (
+    <G>
+      <Path d="M112 148 Q160 186 200 125" stroke={LEASH_COLOR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
+      <Ellipse cx="88" cy="182" rx="23" ry="19" fill="#D4A055" />
+      <Ellipse cx="113" cy="182" rx="19" ry="17" fill="#C89040" />
+      <Rect x="77" y="162" width="12" height="34" rx="6" fill="#D4A055" />
+      <Rect x="93" y="162" width="12" height="34" rx="6" fill="#C89040" />
+      <Ellipse cx="83" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="99" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="98" cy="156" rx="27" ry="21" fill="#D4A055" />
+      <Ellipse cx="98" cy="136" rx="16" ry="12" fill="#D4A055" />
+      <Rect x="83" y="142" width="29" height="7" rx="3" fill={col} />
+      <Circle cx="98" cy="146" r="3" fill="#FFD166" />
+      <Ellipse cx="98" cy="115" rx="23" ry="21" fill="#D4A055" />
+      <Ellipse cx="91" cy="111" rx="12" ry="9" fill="#EEC070" opacity="0.5" />
+      <Ellipse cx="78" cy="121" rx="9" ry="16" fill="#C08030" rotation="-14" originX="78" originY="121" />
+      <Ellipse cx="118" cy="121" rx="9" ry="16" fill="#C08030" rotation="14" originX="118" originY="121" />
+      <Ellipse cx="98" cy="128" rx="12" ry="9" fill="#C89040" />
+      <Ellipse cx="98" cy="124" rx="9" ry="6" fill="#DCAA5A" />
+      <Ellipse cx="98" cy="120" rx="6" ry="4" fill="#2C1810" />
+      <Circle cx="88" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="109" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="86.5" cy="110.5" r="1.8" fill="white" />
+      <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
+      <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
+      <G rotation={wag} originX="122" originY="160">
+        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
+    </G>
+  );
+}
+
+function DogWalkStay({ col, wag }: { col: string; wag: number }) {
+  return (
+    <G>
+      <Line x1="115" y1="176" x2="205" y2="176" stroke={col} strokeWidth="1.5" strokeDasharray="5 4" opacity="0.4" />
+      <SvgText x="160" y="171" textAnchor="middle" fontSize="10" fill={col} fontWeight="700" opacity="0.8">רגע...</SvgText>
+      <Path d="M112 148 Q160 186 200 125" stroke={LEASH_COLOR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
+      <Ellipse cx="88" cy="182" rx="23" ry="19" fill="#D4A055" />
+      <Ellipse cx="113" cy="182" rx="19" ry="17" fill="#C89040" />
+      <Rect x="77" y="162" width="12" height="34" rx="6" fill="#D4A055" />
+      <Rect x="93" y="162" width="12" height="34" rx="6" fill="#C89040" />
+      <Ellipse cx="83" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="99" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="98" cy="156" rx="27" ry="21" fill="#D4A055" />
+      <Ellipse cx="98" cy="136" rx="16" ry="12" fill="#D4A055" />
+      <Rect x="83" y="142" width="29" height="7" rx="3" fill={col} />
+      <Circle cx="98" cy="146" r="3" fill="#FFD166" />
+      <Ellipse cx="98" cy="115" rx="23" ry="21" fill="#D4A055" />
+      <Ellipse cx="91" cy="111" rx="12" ry="9" fill="#EEC070" opacity="0.5" />
+      <Ellipse cx="78" cy="121" rx="9" ry="16" fill="#C08030" rotation="-14" originX="78" originY="121" />
+      <Ellipse cx="118" cy="121" rx="9" ry="16" fill="#C08030" rotation="14" originX="118" originY="121" />
+      <Ellipse cx="98" cy="128" rx="12" ry="9" fill="#C89040" />
+      <Ellipse cx="98" cy="124" rx="9" ry="6" fill="#DCAA5A" />
+      <Ellipse cx="98" cy="120" rx="6" ry="4" fill="#2C1810" />
+      <Circle cx="88" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="109" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="86.5" cy="110.5" r="1.8" fill="white" />
+      <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
+      <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
+      <G rotation={wag} originX="122" originY="160">
+        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
+    </G>
+  );
+}
+
 function Human({ pose }: { pose: string }) {
-  const isBack = pose === 'leave_back';
+  const isBack = pose === 'leave_back' || pose === 'walk_pull';
   return (
     <G>
       <Ellipse cx="245" cy="200" rx="20" ry="5" fill="#90B860" opacity="0.35" />
@@ -347,13 +466,31 @@ function Human({ pose }: { pose: string }) {
           <Rect x="207" y="103" width="5" height="11" rx="2.5" fill="#E8956A" />
         </G>
       )}
-      {pose === 'leave_back' && (
+      {(pose === 'leave_back' || pose === 'walk_pull') && (
         <G>
           <Rect x="262" y="110" width="20" height="8" rx="4" fill="#D07050" rotation="10" originX="262" originY="114" />
           <Circle cx="282" cy="118" r="6" fill="#D07050" />
         </G>
       )}
-      {pose !== 'leave_back' && (
+      {pose === 'walk_pull' && (
+        <G>
+          <Rect x="200" y="108" width="30" height="8" rx="4" fill="#D07050" rotation="-6" originX="230" originY="112" />
+          <Circle cx="198" cy="112" r="6" fill="#D07050" />
+        </G>
+      )}
+      {pose === 'walk_sit' && (
+        <G>
+          <Rect x="205" y="112" width="26" height="8" rx="4" fill="#E8956A" rotation="15" originX="231" originY="116" />
+          <Circle cx="203" cy="120" r="6" fill="#E8956A" />
+        </G>
+      )}
+      {pose === 'walk_stay' && (
+        <G>
+          <Rect x="215" y="72" width="12" height="34" rx="5" fill="#E8956A" rotation="-25" originX="231" originY="103" />
+          <Circle cx="211" cy="70" r="7" fill="#E8956A" />
+        </G>
+      )}
+      {pose !== 'leave_back' && pose !== 'walk_pull' && (
         <Rect x="262" y="110" width="13" height="8" rx="4" fill="#E8956A" rotation="-18" originX="262" originY="114" />
       )}
       <Rect x="241" y="92" width="11" height="14" rx="5" fill="#E8956A" />
@@ -440,6 +577,9 @@ export default function DogScene({ illustration, size = 300 }: DogSceneProps) {
             {illustration === 'leave_close' && <DogLeaveClose col={col} wag={tailAngle} />}
             {illustration === 'leave_back' && <DogLeaveBack col={col} wag={tailAngle} />}
             {illustration === 'leave_walk' && <DogLeaveWalk col={col} wag={tailAngle} />}
+            {illustration === 'walk_pull' && <DogWalkPull col={col} wag={tailAngle} />}
+            {illustration === 'walk_sit' && <DogWalkSit col={col} wag={tailAngle} />}
+            {illustration === 'walk_stay' && <DogWalkStay col={col} wag={tailAngle} />}
           </G>
         )}
       </Svg>

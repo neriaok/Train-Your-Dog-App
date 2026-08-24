@@ -1,7 +1,8 @@
 export type IllustrationKey =
   | 'sit' | 'come' | 'down'
   | 'crate_enter' | 'crate_return' | 'crate_full'
-  | 'leave_close' | 'leave_back' | 'leave_walk';
+  | 'leave_close' | 'leave_back' | 'leave_walk'
+  | 'walk_pull' | 'walk_sit' | 'walk_stay';
 
 export interface Step {
   id: number;
@@ -72,6 +73,23 @@ export const LEVELS: Level[] = [
         tip: "אמרו עזוב, עמדו במקומכם והסתובבו גב לכלב. אל תתרחקו! אם מחזיק - סובבו ותגמלו." },
       { id: 3, commands: ["עזוב"], emoji: "👣", illustration: "leave_walk",
         tip: "רק כשהכלב מצליח בשלב 2 - צעדו 3 צעדים אחורה. אם נשאר - חזרו אליו ותגמלו שם." },
+    ],
+  },
+  {
+    id: 4,
+    title: "טיול עם רצועה",
+    subtitle: "הליכה בלי משיכות",
+    emoji: "🦮",
+    color: "#06D6A0",
+    colorLight: "#E6FBF5",
+    colorMid: "#8FE3C5",
+    steps: [
+      { id: 1, commands: ["לידי"], emoji: "🔄", illustration: "walk_pull",
+        tip: "שימו רצועה וצאו לטיול. ברגע שהכלב מושך - עצרו במקום והתחילו ללכת לכיוון ההפוך. חזרו על כך בכל פעם שהוא מושך, כדי שילמד שהוא זה שצריך לעקוב אחריכם." },
+      { id: 2, commands: ["לידי", "שב"], emoji: "🪑", illustration: "walk_sit",
+        tip: "תרגלו את העצירה-והיפוך פעמיים. בכל פעם שעוצרים, בקשו מהכלב שב. כשיושב בלי למשוך - תגמלו מיד בחטיף ושבח." },
+      { id: 3, commands: ["לידי", "שב", "הישאר"], emoji: "✋", illustration: "walk_stay",
+        tip: "תרגלו פעמיים נוספות, ולפני שממשיכים בהליכה הוסיפו את פקודת הישאר. זה מלמד את הכלב לחכות בסבלנות לפני שיוצאים לדרך." },
     ],
   },
 ];
