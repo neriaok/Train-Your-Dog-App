@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated, StyleSheet } from 'react-native';
 
 interface Props {
   value: number;
@@ -9,6 +9,22 @@ interface Props {
 
 export default function ProgressBar({ value, total, color }: Props) {
   const pct = Math.round((value / total) * 100);
+  const widthAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(widthAnim, {
+      toValue: pct,
+      duration: 550,
+      useNativeDriver: false,
+    }).start();
+  }, [pct]);
+
+  const width = widthAnim.interpolate({
+    inputRange: [0, 100],
+    outputRange: ['0%', '100%'],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -16,7 +32,7 @@ export default function ProgressBar({ value, total, color }: Props) {
         <Text style={[styles.pct, { color }]}>{pct}%</Text>
       </View>
       <View style={[styles.track, { backgroundColor: color + '22' }]}>
-        <View style={[styles.fill, { width: `${pct}%`, backgroundColor: color }]} />
+        <Animated.View style={[styles.fill, { width, backgroundColor: color }]} />
       </View>
     </View>
   );

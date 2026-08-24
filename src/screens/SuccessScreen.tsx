@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView,
+  View, Text, ScrollView,
   Animated, StyleSheet
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import Confetti from '../components/Confetti';
+import PressableScale from '../components/PressableScale';
 import { LEVELS, Level, C } from '../data';
 
 interface Props {
@@ -97,19 +98,19 @@ export default function SuccessScreen({ level, isLast, onNext, onRestart }: Prop
           {/* Buttons */}
           <View style={styles.btns}>
             {nextLevel && !isLast && (
-              <TouchableOpacity
-                onPress={onNext} activeOpacity={0.85}
+              <PressableScale
+                onPress={onNext}
                 style={[styles.nextBtn, { backgroundColor: nextLevel.color }]}
               >
                 <Text style={styles.btnText}>הבא {nextLevel.emoji}</Text>
-              </TouchableOpacity>
+              </PressableScale>
             )}
-            <TouchableOpacity
-              onPress={onRestart} activeOpacity={0.85}
+            <PressableScale
+              onPress={onRestart}
               style={[styles.restartBtn, { borderColor: level.color }]}
             >
               <Text style={[styles.restartText, { color: level.color }]}>🔄 שוב</Text>
-            </TouchableOpacity>
+            </PressableScale>
           </View>
         </Animated.View>
       </ScrollView>

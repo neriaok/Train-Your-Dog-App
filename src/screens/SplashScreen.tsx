@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Animated, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
+import PressableScale from '../components/PressableScale';
 import { C } from '../data';
 
 interface Props { onStart: () => void }
@@ -38,9 +39,9 @@ export default function SplashScreen({ onStart }: Props) {
             ))}
           </View>
 
-          <TouchableOpacity style={styles.cta} onPress={onStart} activeOpacity={0.85}>
+          <PressableScale style={styles.cta} onPress={onStart}>
             <Text style={styles.ctaText}>בואו נתחיל לאלף 🚀</Text>
-          </TouchableOpacity>
+          </PressableScale>
 
           <Text style={styles.fine}>לא נדרשת הרשמה - חינמי לגמרי</Text>
         </Animated.View>

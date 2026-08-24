@@ -6,6 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import ProgressBar from '../components/ProgressBar';
+import PressableScale from '../components/PressableScale';
 import { Level, Step, C } from '../data';
 
 interface Props {
@@ -127,10 +128,9 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
         </View>
 
         {/* Done button */}
-        <TouchableOpacity
+        <PressableScale
           onPress={handleDone}
           disabled={done}
-          activeOpacity={0.85}
           style={[
             styles.doneBtn,
             { backgroundColor: done ? '#06D6A0' : accent },
@@ -139,7 +139,7 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
           <Text style={styles.doneBtnText}>
             {done ? 'מעולה! ממשיכים...' : 'השלמתי את השלב! ✅'}
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
       </ScrollView>
     </SafeAreaView>
   );

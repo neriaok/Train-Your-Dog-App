@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Animated, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProgressBar from '../components/ProgressBar';
+import PressableScale from '../components/PressableScale';
 import { LEVELS, C } from '../data';
 
 interface Props {
@@ -37,10 +38,11 @@ export default function LevelSelectScreen({ completed, onSelect }: Props) {
           const locked = i > 0 && !completed.includes(LEVELS[i - 1].id);
           const done = completed.includes(lvl.id);
           return (
-            <TouchableOpacity
+            <PressableScale
               key={lvl.id}
-              onPress={() => !locked && onSelect(lvl.id)}
-              activeOpacity={locked ? 1 : 0.8}
+              onPress={() => onSelect(lvl.id)}
+              disabled={locked}
+              scaleTo={0.98}
               style={[
                 styles.card,
                 done ? { borderColor: lvl.color, borderWidth: 2 } :
@@ -75,7 +77,7 @@ export default function LevelSelectScreen({ completed, onSelect }: Props) {
                   <Text style={[styles.arrow, { color: lvl.color }]}>{'\u2190'}</Text>
                 )}
               </View>
-            </TouchableOpacity>
+            </PressableScale>
           );
         })}
       </ScrollView>

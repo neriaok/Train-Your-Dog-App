@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing } from 'react-native';
 import Svg, {
   Ellipse, Rect, Circle, Path, Line, Polygon, Text as SvgText, G
 } from 'react-native-svg';
@@ -17,7 +18,7 @@ const bubbleTexts: Record<IllustrationKey, string> = {
   leave_close: 'עזוב!', leave_back: 'עזוב!', leave_walk: 'עזוב!',
 };
 
-function DogSit({ col }: { col: string }) {
+function DogSit({ col, wag }: { col: string; wag: number }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
@@ -45,13 +46,15 @@ function DogSit({ col }: { col: string }) {
       <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
       {/* Tail */}
-      <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-      <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="122" originY="160">
+        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
 
-function DogCome({ col }: { col: string }) {
+function DogCome({ col, wag }: { col: string; wag: number }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
@@ -78,13 +81,15 @@ function DogCome({ col }: { col: string }) {
       <Circle cx="62.5" cy="134.5" r="1.8" fill="white" />
       <Circle cx="77.5" cy="133.5" r="1.8" fill="white" />
       <Path d="M47 152 Q51 161 49 166 Q53 171 57 166 Q55 161 59 152" fill="#D4608A" />
-      <Path d="M132 163 Q150 141 154 122" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-      <Path d="M132 163 Q150 141 154 122" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="132" originY="163">
+        <Path d="M132 163 Q150 141 154 122" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M132 163 Q150 141 154 122" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
 
-function DogDown({ col }: { col: string }) {
+function DogDown({ col, wag }: { col: string; wag: number }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="48" ry="6" fill="#90B860" opacity="0.4" />
@@ -106,13 +111,15 @@ function DogDown({ col }: { col: string }) {
       <Ellipse cx="44" cy="174" rx="5" ry="3" fill="#2C1810" />
       <Path d="M57 162 Q62 158 67 162" stroke="#2C1810" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <Path d="M71 161 Q76 157 81 161" stroke="#2C1810" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <Path d="M144 190 Q160 183 168 174" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-      <Path d="M144 190 Q160 183 168 174" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="144" originY="190">
+        <Path d="M144 190 Q160 183 168 174" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M144 190 Q160 183 168 174" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
 
-function CrateAndDog({ open, col }: { open: boolean; col: string }) {
+function CrateAndDog({ open, col, wag }: { open: boolean; col: string; wag: number }) {
   return (
     <G>
       {/* Crate */}
@@ -155,13 +162,15 @@ function CrateAndDog({ open, col }: { open: boolean; col: string }) {
       <Circle cx="51" cy="118" r="4" fill="#2C1810" />
       <Circle cx="36.5" cy="117.5" r="1.4" fill="white" />
       <Circle cx="49.5" cy="116.5" r="1.4" fill="white" />
-      <Path d="M88 141 Q102 128 105 115" stroke="#B87830" strokeWidth="9" fill="none" strokeLinecap="round" />
-      <Path d="M88 141 Q102 128 105 115" stroke="#D4A055" strokeWidth="5" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="88" originY="141">
+        <Path d="M88 141 Q102 128 105 115" stroke="#B87830" strokeWidth="9" fill="none" strokeLinecap="round" />
+        <Path d="M88 141 Q102 128 105 115" stroke="#D4A055" strokeWidth="5" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
 
-function DogLeaveClose({ col }: { col: string }) {
+function DogLeaveClose({ col, wag }: { col: string; wag: number }) {
   return (
     <G>
       {/* Bone */}
@@ -195,13 +204,15 @@ function DogLeaveClose({ col }: { col: string }) {
       <Path d="M118 130 Q119 137 118 142" stroke="#A0C8F0" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.8" />
       <Circle cx="118" cy="144" r="3" fill="#A0C8F0" opacity="0.7" />
       <Path d="M152 192 Q138 174 120 128" stroke="#9B5DE5" strokeWidth="1.5" strokeDasharray="4 3" fill="none" opacity="0.5" />
-      <Path d="M113 158 Q122 174 120 183" stroke="#B87830" strokeWidth="9" fill="none" strokeLinecap="round" />
-      <Path d="M113 158 Q122 174 120 183" stroke="#D4A055" strokeWidth="5" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="113" originY="158">
+        <Path d="M113 158 Q122 174 120 183" stroke="#B87830" strokeWidth="9" fill="none" strokeLinecap="round" />
+        <Path d="M113 158 Q122 174 120 183" stroke="#D4A055" strokeWidth="5" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
 
-function DogLeaveBack({ col }: { col: string }) {
+function DogLeaveBack({ col, wag }: { col: string; wag: number }) {
   return (
     <G>
       <Rect x="148" y="192" width="18" height="5" rx="2" fill="#E8C080" />
@@ -232,13 +243,15 @@ function DogLeaveBack({ col }: { col: string }) {
       <Path d="M80 129 Q87 135 94 129" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="87" cy="131" rx="4" ry="3" fill="#D4608A" opacity="0.7" />
       <SvgText x="87" y="90" textAnchor="middle" fontSize="18" fill="#06D6A0" fontWeight="800">V</SvgText>
-      <Path d="M109 160 Q128 141 132 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-      <Path d="M109 160 Q128 141 132 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="109" originY="160">
+        <Path d="M109 160 Q128 141 132 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M109 160 Q128 141 132 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
 
-function DogLeaveWalk({ col }: { col: string }) {
+function DogLeaveWalk({ col, wag }: { col: string; wag: number }) {
   return (
     <G>
       <Rect x="128" y="192" width="18" height="5" rx="2" fill="#E8C080" />
@@ -272,8 +285,10 @@ function DogLeaveWalk({ col }: { col: string }) {
       <Ellipse cx="72" cy="130" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
       <SvgText x="72" y="88" fontSize="15" fill="#FFD166" textAnchor="middle">&#11088;</SvgText>
       <SvgText x="72" y="75" fontSize="10" fill="#9B5DE5" textAnchor="middle" fontWeight="800">כל הכבוד!</SvgText>
-      <Path d="M93 158 Q110 139 114 124" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-      <Path d="M93 158 Q110 139 114 124" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      <G rotation={wag} originX="93" originY="158">
+        <Path d="M93 158 Q110 139 114 124" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M93 158 Q110 139 114 124" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
     </G>
   );
 }
@@ -377,29 +392,57 @@ export default function DogScene({ illustration, size = 300 }: DogSceneProps) {
   const bubbleCx = 265 + bubbleWidth / 2;
   const fontSize = illustration === 'crate_return' ? 11 : 14;
 
+  const bob = useRef(new Animated.Value(0)).current;
+  const tailPhase = useRef(new Animated.Value(0)).current;
+  const [tailAngle, setTailAngle] = useState(-10);
+
+  useEffect(() => {
+    const bobLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(bob, { toValue: 1, duration: 1600, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(bob, { toValue: 0, duration: 1600, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    );
+    const tailLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(tailPhase, { toValue: 1, duration: 260, easing: Easing.inOut(Easing.quad), useNativeDriver: false }),
+        Animated.timing(tailPhase, { toValue: 0, duration: 260, easing: Easing.inOut(Easing.quad), useNativeDriver: false }),
+      ])
+    );
+    const listenerId = tailPhase.addListener(({ value }) => setTailAngle(-10 + value * 20));
+    bobLoop.start();
+    tailLoop.start();
+    return () => { bobLoop.stop(); tailLoop.stop(); tailPhase.removeListener(listenerId); };
+  }, []);
+
+  const translateY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, -5] });
+  const scale = bob.interpolate({ inputRange: [0, 1], outputRange: [1, 1.012] });
+
   return (
-    <Svg width={size} height={size * 0.66} viewBox="0 0 320 210">
-      <Ellipse cx="160" cy="204" rx="145" ry="8" fill="#D4E8B0" opacity="0.6" />
-      <Line x1="15" y1="204" x2="305" y2="204" stroke="#A8CC78" strokeWidth="1.5" />
-      {isCrateScene && <CrateAndDog open={isOpen} col={col} />}
-      <Human pose={illustration} />
-      {/* Bubble */}
-      <Rect x="265" y="36" width={bubbleWidth} height="32" rx="13" fill="white" stroke="#6B5CE7" strokeWidth="1.5" />
-      <Polygon points={`271,68 277,81 287,68`} fill="white" stroke="#6B5CE7" strokeWidth="1.5" />
-      <Polygon points={`272,67 287,67 278,80`} fill="white" />
-      <SvgText x={bubbleCx} y="57" textAnchor="middle" fontFamily="Heebo" fontSize={fontSize} fontWeight="800" fill="#6B5CE7">
-        {bubbleText}
-      </SvgText>
-      {!isCrateScene && (
-        <G>
-          {illustration === 'sit' && <DogSit col={col} />}
-          {illustration === 'come' && <DogCome col={col} />}
-          {illustration === 'down' && <DogDown col={col} />}
-          {illustration === 'leave_close' && <DogLeaveClose col={col} />}
-          {illustration === 'leave_back' && <DogLeaveBack col={col} />}
-          {illustration === 'leave_walk' && <DogLeaveWalk col={col} />}
-        </G>
-      )}
-    </Svg>
+    <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
+      <Svg width={size} height={size * 0.66} viewBox="0 0 320 210">
+        <Ellipse cx="160" cy="204" rx="145" ry="8" fill="#D4E8B0" opacity="0.6" />
+        <Line x1="15" y1="204" x2="305" y2="204" stroke="#A8CC78" strokeWidth="1.5" />
+        {isCrateScene && <CrateAndDog open={isOpen} col={col} wag={tailAngle} />}
+        <Human pose={illustration} />
+        {/* Bubble */}
+        <Rect x="265" y="36" width={bubbleWidth} height="32" rx="13" fill="white" stroke="#6B5CE7" strokeWidth="1.5" />
+        <Polygon points={`271,68 277,81 287,68`} fill="white" stroke="#6B5CE7" strokeWidth="1.5" />
+        <Polygon points={`272,67 287,67 278,80`} fill="white" />
+        <SvgText x={bubbleCx} y="57" textAnchor="middle" fontFamily="Heebo" fontSize={fontSize} fontWeight="800" fill="#6B5CE7">
+          {bubbleText}
+        </SvgText>
+        {!isCrateScene && (
+          <G>
+            {illustration === 'sit' && <DogSit col={col} wag={tailAngle} />}
+            {illustration === 'come' && <DogCome col={col} wag={tailAngle} />}
+            {illustration === 'down' && <DogDown col={col} wag={tailAngle} />}
+            {illustration === 'leave_close' && <DogLeaveClose col={col} wag={tailAngle} />}
+            {illustration === 'leave_back' && <DogLeaveBack col={col} wag={tailAngle} />}
+            {illustration === 'leave_walk' && <DogLeaveWalk col={col} wag={tailAngle} />}
+          </G>
+        )}
+      </Svg>
+    </Animated.View>
   );
 }

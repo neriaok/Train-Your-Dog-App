@@ -4,7 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts, Heebo_400Regular, Heebo_500Medium, Heebo_600SemiBold, Heebo_700Bold, Heebo_800ExtraBold } from '@expo-google-fonts/heebo';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View } from 'react-native';
+import { View, Animated } from 'react-native';
 
 import { LEVELS } from './src/data';
 import SplashScreenComp from './src/screens/SplashScreen';
@@ -25,6 +25,7 @@ export default function App() {
   const [completed, setCompleted] = useState<number[]>([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const hasLoadedProgress = useRef(false);
+  const screenFade = useRef(new Animated.Value(1)).current;
 
   const [fontsLoaded] = useFonts({
     Heebo_400Regular,
@@ -52,6 +53,11 @@ export default function App() {
     }
     AsyncStorage.setItem(COMPLETED_LEVELS_KEY, JSON.stringify(completed));
   }, [completed, progressLoaded]);
+
+  useEffect(() => {
+    screenFade.setValue(0);
+    Animated.timing(screenFade, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+  }, [screen]);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) await SplashScreen.hideAsync();
@@ -93,24 +99,26 @@ export default function App() {
     <SafeAreaProvider>
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
         <StatusBar style="dark" />
-        {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
-        {screen === 'levels' && <LevelSelectScreen completed={completed} onSelect={handleSelect} />}
-        {screen === 'step' && level && step && (
-          <StepScreen
-            key={`${levelId}-${stepIdx}`}
-            level={level} step={step}
-            stepIdx={stepIdx} totalSteps={level.steps.length}
-            onComplete={handleStepDone} onBack={handleBack}
-          />
-        )}
-        {screen === 'success' && level && (
-          <SuccessScreen
-            level={level}
-            isLast={levelId === LEVELS[LEVELS.length - 1].id}
-            onNext={handleNext}
-            onRestart={handleRestart}
-          />
-        )}
+        <Animated.View style={{ flex: 1, opacity: screenFade }}>
+          {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
+          {screen === 'levels' && <LevelSelectScreen completed={completed} onSelect={handleSelect} />}
+          {screen === 'step' && level && step && (
+            <StepScreen
+              key={`${levelId}-${stepIdx}`}
+              level={level} step={step}
+              stepIdx={stepIdx} totalSteps={level.steps.length}
+              onComplete={handleStepDone} onBack={handleBack}
+            />
+          )}
+          {screen === 'success' && level && (
+            <SuccessScreen
+              level={level}
+              isLast={levelId === LEVELS[LEVELS.length - 1].id}
+              onNext={handleNext}
+              onRestart={handleRestart}
+            />
+          )}
+        </Animated.View>
       </View>
     </SafeAreaProvider>
   );
