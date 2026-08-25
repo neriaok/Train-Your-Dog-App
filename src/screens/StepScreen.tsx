@@ -8,6 +8,8 @@ import DogScene from '../components/DogScene';
 import ProgressBar from '../components/ProgressBar';
 import PressableScale from '../components/PressableScale';
 import { Level, Step, C } from '../data';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useStrings } from '../i18n/strings';
 
 interface Props {
   level: Level;
@@ -50,6 +52,8 @@ function CmdBadge({ cmd, delay, visible, color }: {
 }
 
 export default function StepScreen({ level, step, stepIdx, totalSteps, onComplete, onBack }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = useStrings(language).step;
   const [cmdsVisible, setCmdsVisible] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -75,12 +79,12 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
       <View style={[styles.header, { backgroundColor: accentL }]}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={onBack} style={[styles.backBtn, { borderColor: accent + '40' }]}>
-            <Text style={[styles.backText, { color: accent }]}>{'\u2192'} חזרה</Text>
+            <Text style={[styles.backText, { color: accent }]}>{isRTL ? '→' : '←'} {t.back}</Text>
           </TouchableOpacity>
           <View style={styles.headerRight}>
             <View style={[styles.levelBadge, { borderColor: accent + '30' }]}>
               <Text style={[styles.levelBadgeText, { color: accent }]}>
-                {level.emoji} רמה {level.id}
+                {t.levelBadge(level.emoji, level.id)}
               </Text>
             </View>
             <Text style={styles.stepCount}>{stepIdx + 1}/{totalSteps}</Text>
@@ -96,18 +100,18 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
           <View style={[styles.stepIcon, { backgroundColor: accentL }]}>
             <Text style={{ fontSize: 22 }}>{step.emoji}</Text>
           </View>
-          <Text style={styles.stepTitle}>שלב {stepIdx + 1}</Text>
+          <Text style={styles.stepTitle}>{t.stepTitle(stepIdx + 1)}</Text>
           <Text style={styles.stepSub}>
-            {step.commands.length === 1 ? 'פקודה אחת ללמוד' : `${step.commands.length} פקודות ללמוד`}
+            {step.commands.length === 1 ? t.oneCommand : t.manyCommands(step.commands.length)}
           </Text>
         </View>
 
         {/* Scene + Commands */}
         <View style={styles.card}>
           <View style={{ alignItems: 'center' }}>
-            <DogScene illustration={step.illustration} size={300} />
+            <DogScene illustration={step.illustration} language={language} size={300} />
           </View>
-          <Text style={styles.cmdLabel}>פקודות לתרגול:</Text>
+          <Text style={styles.cmdLabel}>{t.commandsLabel}</Text>
           <View style={styles.cmdsRow}>
             {step.commands.map((cmd, i) => (
               <CmdBadge
@@ -122,7 +126,7 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
         <View style={styles.tipCard}>
           <Text style={{ fontSize: 22 }}>💡</Text>
           <View style={{ flex: 1 }}>
-            <Text style={styles.tipTitle}>טיפ מהמאלף:</Text>
+            <Text style={styles.tipTitle}>{t.tipLabel}</Text>
             <Text style={styles.tipText}>{step.tip}</Text>
           </View>
         </View>
@@ -137,7 +141,7 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
           ]}
         >
           <Text style={styles.doneBtnText}>
-            {done ? 'מעולה! ממשיכים...' : 'השלמתי את השלב! ✅'}
+            {done ? t.doneBtnDone : t.doneBtn}
           </Text>
         </PressableScale>
       </ScrollView>

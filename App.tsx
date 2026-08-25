@@ -6,12 +6,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Animated } from 'react-native';
 
-import { LEVELS } from './src/data';
 import SplashScreenComp from './src/screens/SplashScreen';
 import LevelSelectScreen from './src/screens/LevelSelectScreen';
 import StepScreen from './src/screens/StepScreen';
 import SuccessScreen from './src/screens/SuccessScreen';
 import AgentChatScreen from './src/screens/AgentChatScreen';
+import { LanguageProvider, useLanguage } from './src/i18n/LanguageContext';
+import { useLevels } from './src/i18n/useLevels';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,7 +20,10 @@ type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent';
 
 const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
 
-export default function App() {
+function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
+  const { isRTL, ready: languageReady } = useLanguage();
+  const LEVELS = useLevels();
+
   const [screen, setScreen] = useState<Screen>('splash');
   const [levelId, setLevelId] = useState(1);
   const [stepIdx, setStepIdx] = useState(0);
@@ -27,14 +31,6 @@ export default function App() {
   const [progressLoaded, setProgressLoaded] = useState(false);
   const hasLoadedProgress = useRef(false);
   const screenFade = useRef(new Animated.Value(1)).current;
-
-  const [fontsLoaded] = useFonts({
-    Heebo_400Regular,
-    Heebo_500Medium,
-    Heebo_600SemiBold,
-    Heebo_700Bold,
-    Heebo_800ExtraBold,
-  });
 
   useEffect(() => {
     AsyncStorage.getItem(COMPLETED_LEVELS_KEY)
@@ -60,11 +56,7 @@ export default function App() {
     Animated.timing(screenFade, { toValue: 1, duration: 350, useNativeDriver: true }).start();
   }, [screen]);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) await SplashScreen.hideAsync();
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded || !progressLoaded) return null;
+  if (!progressLoaded || !languageReady) return null;
 
   const level = LEVELS.find(l => l.id === levelId)!;
   const step = level?.steps[stepIdx];
@@ -98,33 +90,56 @@ export default function App() {
   const handleOpenAgent = () => setScreen('agent');
 
   return (
+    <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
+      <StatusBar style="dark" />
+      <Animated.View style={{ flex: 1, opacity: screenFade }}>
+        {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
+        {screen === 'levels' && (
+          <LevelSelectScreen levels={LEVELS} completed={completed} onSelect={handleSelect} onOpenAgent={handleOpenAgent} />
+        )}
+        {screen === 'agent' && <AgentChatScreen levels={LEVELS} onBack={handleBack} />}
+        {screen === 'step' && level && step && (
+          <StepScreen
+            key={`${levelId}-${stepIdx}`}
+            level={level} step={step}
+            stepIdx={stepIdx} totalSteps={level.steps.length}
+            onComplete={handleStepDone} onBack={handleBack}
+          />
+        )}
+        {screen === 'success' && level && (
+          <SuccessScreen
+            levels={LEVELS}
+            level={level}
+            isLast={levelId === LEVELS[LEVELS.length - 1].id}
+            onNext={handleNext}
+            onRestart={handleRestart}
+          />
+        )}
+      </Animated.View>
+    </View>
+  );
+}
+
+export default function App() {
+  const [fontsLoaded] = useFonts({
+    Heebo_400Regular,
+    Heebo_500Medium,
+    Heebo_600SemiBold,
+    Heebo_700Bold,
+    Heebo_800ExtraBold,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) await SplashScreen.hideAsync();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+
+  return (
     <SafeAreaProvider>
-      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-        <StatusBar style="dark" />
-        <Animated.View style={{ flex: 1, opacity: screenFade }}>
-          {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
-          {screen === 'levels' && (
-            <LevelSelectScreen completed={completed} onSelect={handleSelect} onOpenAgent={handleOpenAgent} />
-          )}
-          {screen === 'agent' && <AgentChatScreen onBack={handleBack} />}
-          {screen === 'step' && level && step && (
-            <StepScreen
-              key={`${levelId}-${stepIdx}`}
-              level={level} step={step}
-              stepIdx={stepIdx} totalSteps={level.steps.length}
-              onComplete={handleStepDone} onBack={handleBack}
-            />
-          )}
-          {screen === 'success' && level && (
-            <SuccessScreen
-              level={level}
-              isLast={levelId === LEVELS[LEVELS.length - 1].id}
-              onNext={handleNext}
-              onRestart={handleRestart}
-            />
-          )}
-        </Animated.View>
-      </View>
+      <LanguageProvider>
+        <AppInner onLayoutRootView={onLayoutRootView} />
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

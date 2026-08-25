@@ -7,23 +7,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableScale from '../components/PressableScale';
 import { runAgent } from '../agent/runAgent';
 import { AgentStep, AgentMessage } from '../agent/types';
-import { C } from '../data';
+import { Level, C } from '../data';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useStrings } from '../i18n/strings';
 
-interface Props { onBack: () => void; }
+interface Props { levels: Level[]; onBack: () => void; }
 
 type ChatEntry =
   | { id: string; kind: 'user'; text: string }
   | { id: string; kind: 'step'; step: AgentStep };
 
-const INTRO_STEP: AgentStep = {
-  type: 'final',
-  text: 'שלום! אני עוזר האילוף. שאל אותי על פקודה, על רמה, או בקש "טיפ"!',
-};
-
-export default function AgentChatScreen({ onBack }: Props) {
+export default function AgentChatScreen({ levels, onBack }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = useStrings(language).agent;
   const [input, setInput] = useState('');
   const [entries, setEntries] = useState<ChatEntry[]>([
-    { id: 'intro', kind: 'step', step: INTRO_STEP },
+    { id: 'intro', kind: 'step', step: { type: 'final', text: t.intro } },
   ]);
   const historyRef = useRef<AgentMessage[]>([]);
   const scrollRef = useRef<ScrollView>(null);
@@ -34,7 +33,7 @@ export default function AgentChatScreen({ onBack }: Props) {
     setInput('');
     setEntries(prev => [...prev, { id: `u-${Date.now()}`, kind: 'user', text }]);
 
-    const steps = await runAgent(text, historyRef.current);
+    const steps = await runAgent(text, levels, language, historyRef.current);
     steps.forEach((step, i) => {
       setTimeout(() => {
         setEntries(prev => [...prev, { id: `a-${Date.now()}-${i}`, kind: 'step', step }]);
@@ -54,9 +53,9 @@ export default function AgentChatScreen({ onBack }: Props) {
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <PressableScale onPress={onBack} style={styles.backBtn}>
-          <Text style={styles.backText}>{'→'} חזרה</Text>
+          <Text style={styles.backText}>{isRTL ? '→' : '←'} {t.back}</Text>
         </PressableScale>
-        <Text style={styles.title}>🤖 עוזר אילוף</Text>
+        <Text style={styles.title}>{t.title}</Text>
       </View>
 
       <KeyboardAvoidingView
@@ -76,23 +75,23 @@ export default function AgentChatScreen({ onBack }: Props) {
                 </View>
               </View>
             ) : (
-              <AgentStepBubble key={e.id} step={e.step} />
+              <AgentStepBubble key={e.id} step={e.step} t={t} />
             )
           )}
         </ScrollView>
 
         <View style={styles.inputRow}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
             value={input}
             onChangeText={setInput}
-            placeholder='שאל למשל: "מה זה שב?" או "מה יש ברמה 2"'
+            placeholder={t.placeholder}
             placeholderTextColor={C.soft}
             onSubmitEditing={send}
             returnKeyType="send"
           />
           <PressableScale onPress={send} style={styles.sendBtn}>
-            <Text style={styles.sendText}>שלח</Text>
+            <Text style={styles.sendText}>{t.send}</Text>
           </PressableScale>
         </View>
       </KeyboardAvoidingView>
@@ -100,7 +99,7 @@ export default function AgentChatScreen({ onBack }: Props) {
   );
 }
 
-function AgentStepBubble({ step }: { step: AgentStep }) {
+function AgentStepBubble({ step, t }: { step: AgentStep; t: ReturnType<typeof useStrings>['agent'] }) {
   if (step.type === 'thinking') {
     return (
       <View style={styles.systemRow}>
@@ -112,7 +111,7 @@ function AgentStepBubble({ step }: { step: AgentStep }) {
     return (
       <View style={styles.systemRow}>
         <Text style={styles.toolText}>
-          {'🔧 מפעיל כלי: '}
+          {'🔧 ' + t.runningTool + ' '}
           <Text style={styles.toolCode}>{step.tool}({JSON.stringify(step.args)})</Text>
         </Text>
       </View>
@@ -121,7 +120,7 @@ function AgentStepBubble({ step }: { step: AgentStep }) {
   if (step.type === 'tool_result') {
     return (
       <View style={styles.systemRow}>
-        <Text style={styles.toolText}>📦 תוצאת הכלי התקבלה</Text>
+        <Text style={styles.toolText}>📦 {t.toolResult}</Text>
       </View>
     );
   }
@@ -173,7 +172,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1, backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
     borderRadius: 16, paddingHorizontal: 16, paddingVertical: 10,
-    fontSize: 14, fontFamily: 'Heebo_400Regular', color: C.text, textAlign: 'right',
+    fontSize: 14, fontFamily: 'Heebo_400Regular', color: C.text,
   },
   sendBtn: {
     backgroundColor: C.orange, borderRadius: 16,

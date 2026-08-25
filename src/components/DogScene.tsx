@@ -4,6 +4,7 @@ import Svg, {
   Ellipse, Rect, Circle, Path, Line, Polygon, Text as SvgText, G
 } from 'react-native-svg';
 import { IllustrationKey } from '../data';
+import { Language } from '../i18n/LanguageContext';
 
 // Collar color maps to level
 const collarColors: Record<IllustrationKey, string> = {
@@ -13,12 +14,24 @@ const collarColors: Record<IllustrationKey, string> = {
   walk_pull: '#06D6A0', walk_sit: '#06D6A0', walk_stay: '#06D6A0',
 };
 
-const bubbleTexts: Record<IllustrationKey, string> = {
-  sit: 'שב!', come: 'אליי!', down: 'ארצה!',
-  crate_enter: 'מקום!', crate_return: 'אליי! מקום!', crate_full: 'מקום!',
-  leave_close: 'עזוב!', leave_back: 'עזוב!', leave_walk: 'עזוב!',
-  walk_pull: 'לידי!', walk_sit: 'שב!', walk_stay: 'הישאר!',
+const bubbleTexts: Record<Language, Record<IllustrationKey, string>> = {
+  he: {
+    sit: 'שב!', come: 'אליי!', down: 'ארצה!',
+    crate_enter: 'מקום!', crate_return: 'אליי! מקום!', crate_full: 'מקום!',
+    leave_close: 'עזוב!', leave_back: 'עזוב!', leave_walk: 'עזוב!',
+    walk_pull: 'לידי!', walk_sit: 'שב!', walk_stay: 'הישאר!',
+  },
+  en: {
+    sit: 'Sit!', come: 'Come!', down: 'Down!',
+    crate_enter: 'Place!', crate_return: 'Come! Place!', crate_full: 'Place!',
+    leave_close: 'Leave it!', leave_back: 'Leave it!', leave_walk: 'Leave it!',
+    walk_pull: 'Heel!', walk_sit: 'Sit!', walk_stay: 'Stay!',
+  },
 };
+
+const stepsLabel: Record<Language, string> = { he: '3 צעדים', en: '3 steps' };
+const wellDoneLabel: Record<Language, string> = { he: 'כל הכבוד!', en: 'Well done!' };
+const waitLabel: Record<Language, string> = { he: 'רגע...', en: 'Wait...' };
 
 // Leash color, shared by all walk_* poses
 const LEASH_COLOR = '#8B6340';
@@ -256,14 +269,14 @@ function DogLeaveBack({ col, wag }: { col: string; wag: number }) {
   );
 }
 
-function DogLeaveWalk({ col, wag }: { col: string; wag: number }) {
+function DogLeaveWalk({ col, wag, language }: { col: string; wag: number; language: Language }) {
   return (
     <G>
       <Rect x="128" y="192" width="18" height="5" rx="2" fill="#E8C080" />
       <Circle cx="128" cy="194" r="4" fill="#E8C080" />
       <Circle cx="146" cy="194" r="4" fill="#E8C080" />
       <Line x1="112" y1="172" x2="210" y2="172" stroke="#9B5DE5" strokeWidth="1.5" strokeDasharray="5 4" opacity="0.4" />
-      <SvgText x="160" y="167" textAnchor="middle" fontSize="10" fill="#9B5DE5" fontWeight="700" opacity="0.8">3 צעדים</SvgText>
+      <SvgText x="160" y="167" textAnchor="middle" fontSize="10" fill="#9B5DE5" fontWeight="700" opacity="0.8">{stepsLabel[language]}</SvgText>
       <Ellipse cx="74" cy="198" rx="32" ry="5" fill="#90B860" opacity="0.4" />
       <Ellipse cx="63" cy="181" rx="21" ry="17" fill="#D4A055" />
       <Ellipse cx="86" cy="181" rx="17" ry="15" fill="#C89040" />
@@ -289,7 +302,7 @@ function DogLeaveWalk({ col, wag }: { col: string; wag: number }) {
       <Path d="M65 128 Q72 135 79 128" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="72" cy="130" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
       <SvgText x="72" y="88" fontSize="15" fill="#FFD166" textAnchor="middle">&#11088;</SvgText>
-      <SvgText x="72" y="75" fontSize="10" fill="#9B5DE5" textAnchor="middle" fontWeight="800">כל הכבוד!</SvgText>
+      <SvgText x="72" y="75" fontSize="10" fill="#9B5DE5" textAnchor="middle" fontWeight="800">{wellDoneLabel[language]}</SvgText>
       <G rotation={wag} originX="93" originY="158">
         <Path d="M93 158 Q110 139 114 124" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
         <Path d="M93 158 Q110 139 114 124" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
@@ -374,11 +387,11 @@ function DogWalkSit({ col, wag }: { col: string; wag: number }) {
   );
 }
 
-function DogWalkStay({ col, wag }: { col: string; wag: number }) {
+function DogWalkStay({ col, wag, language }: { col: string; wag: number; language: Language }) {
   return (
     <G>
       <Line x1="115" y1="176" x2="205" y2="176" stroke={col} strokeWidth="1.5" strokeDasharray="5 4" opacity="0.4" />
-      <SvgText x="160" y="171" textAnchor="middle" fontSize="10" fill={col} fontWeight="700" opacity="0.8">רגע...</SvgText>
+      <SvgText x="160" y="171" textAnchor="middle" fontSize="10" fill={col} fontWeight="700" opacity="0.8">{waitLabel[language]}</SvgText>
       <Path d="M112 148 Q160 186 200 125" stroke={LEASH_COLOR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
       <Ellipse cx="88" cy="182" rx="23" ry="19" fill="#D4A055" />
@@ -516,12 +529,13 @@ function Human({ pose }: { pose: string }) {
 
 interface DogSceneProps {
   illustration: IllustrationKey;
+  language: Language;
   size?: number;
 }
 
-export default function DogScene({ illustration, size = 300 }: DogSceneProps) {
+export default function DogScene({ illustration, language, size = 300 }: DogSceneProps) {
   const col = collarColors[illustration] || '#FF6B35';
-  const bubbleText = bubbleTexts[illustration] || '';
+  const bubbleText = bubbleTexts[language][illustration] || '';
   const isCrateScene = illustration === 'crate_enter' || illustration === 'crate_return' || illustration === 'crate_full';
   const isOpen = illustration === 'crate_enter' || illustration === 'crate_full';
 
@@ -576,10 +590,10 @@ export default function DogScene({ illustration, size = 300 }: DogSceneProps) {
             {illustration === 'down' && <DogDown col={col} wag={tailAngle} />}
             {illustration === 'leave_close' && <DogLeaveClose col={col} wag={tailAngle} />}
             {illustration === 'leave_back' && <DogLeaveBack col={col} wag={tailAngle} />}
-            {illustration === 'leave_walk' && <DogLeaveWalk col={col} wag={tailAngle} />}
+            {illustration === 'leave_walk' && <DogLeaveWalk col={col} wag={tailAngle} language={language} />}
             {illustration === 'walk_pull' && <DogWalkPull col={col} wag={tailAngle} />}
             {illustration === 'walk_sit' && <DogWalkSit col={col} wag={tailAngle} />}
-            {illustration === 'walk_stay' && <DogWalkStay col={col} wag={tailAngle} />}
+            {illustration === 'walk_stay' && <DogWalkStay col={col} wag={tailAngle} language={language} />}
           </G>
         )}
       </Svg>

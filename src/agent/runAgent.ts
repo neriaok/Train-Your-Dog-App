@@ -1,4 +1,6 @@
 import { AgentStep, AgentMessage } from './types';
+import { Level } from '../data';
+import { Language } from '../i18n/LanguageContext';
 import { runMockAgent } from './mockPlanner';
 import { runRealAgent, isRealAgentConfigured } from './realAgent';
 
@@ -8,13 +10,18 @@ import { runRealAgent, isRealAgentConfigured } from './realAgent';
  * back to the free local mock otherwise - or if the real backend errors -
  * so the assistant never just breaks.
  */
-export async function runAgent(userMessage: string, history: AgentMessage[] = []): Promise<AgentStep[]> {
+export async function runAgent(
+  userMessage: string,
+  levels: Level[],
+  language: Language,
+  history: AgentMessage[] = []
+): Promise<AgentStep[]> {
   if (isRealAgentConfigured()) {
     try {
-      return await runRealAgent(userMessage, history);
+      return await runRealAgent(userMessage, history, language);
     } catch {
-      return runMockAgent(userMessage);
+      return runMockAgent(userMessage, levels, language);
     }
   }
-  return runMockAgent(userMessage);
+  return runMockAgent(userMessage, levels, language);
 }

@@ -1,4 +1,5 @@
 import { AgentStep, AgentMessage } from './types';
+import { Language } from '../i18n/LanguageContext';
 
 /**
  * Fill this in with your deployed backend/agent-worker URL to switch the
@@ -13,12 +14,17 @@ export function isRealAgentConfigured(): boolean {
   return AGENT_BACKEND_URL.trim().length > 0;
 }
 
-export async function runRealAgent(userMessage: string, history: AgentMessage[]): Promise<AgentStep[]> {
+export async function runRealAgent(
+  userMessage: string,
+  history: AgentMessage[],
+  language: Language
+): Promise<AgentStep[]> {
   const res = await fetch(`${AGENT_BACKEND_URL.replace(/\/$/, '')}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       messages: [...history, { role: 'user', content: userMessage }],
+      language,
     }),
   });
 

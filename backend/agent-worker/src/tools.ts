@@ -1,38 +1,51 @@
 import type Anthropic from '@anthropic-ai/sdk';
-import { LEVELS } from './data';
+import { getLevels, Language } from './data';
 
-const KNOWN_COMMANDS = Array.from(
-  new Set(LEVELS.flatMap(l => l.steps.flatMap(s => s.commands)))
-);
+function getKnownCommands(language: Language): string[] {
+  return Array.from(new Set(getLevels(language).flatMap(l => l.steps.flatMap(s => s.commands))));
+}
 
-function searchCommand(command: string): string {
-  for (const level of LEVELS) {
+function searchCommand(language: Language, command: string): string {
+  for (const level of getLevels(language)) {
     for (const step of level.steps) {
-      if (step.commands.includes(command)) {
-        return `הפקודה "${command}" נלמדת ברמה ${level.id} (${level.emoji} ${level.title}), שלב ${step.id}. טיפ: ${step.tip}`;
+      if (step.commands.some(c => c.toLowerCase() === command.toLowerCase())) {
+        return language === 'he'
+          ? `הפקודה "${command}" נלמדת ברמה ${level.id} (${level.emoji} ${level.title}), שלב ${step.id}. טיפ: ${step.tip}`
+          : `The command "${command}" is taught in level ${level.id} (${level.emoji} ${level.title}), step ${step.id}. Tip: ${step.tip}`;
       }
     }
   }
-  return `לא מצאתי את הפקודה "${command}" באפליקציה. הפקודות הקיימות: ${KNOWN_COMMANDS.join(', ')}.`;
+  const known = getKnownCommands(language).join(', ');
+  return language === 'he'
+    ? `לא מצאתי את הפקודה "${command}" באפליקציה. הפקודות הקיימות: ${known}.`
+    : `I couldn't find the command "${command}" in the app. Available commands: ${known}.`;
 }
 
-function getLevelOverview(levelId: number): string {
-  const level = LEVELS.find(l => l.id === levelId);
+function getLevelOverview(language: Language, levelId: number): string {
+  const levels = getLevels(language);
+  const level = levels.find(l => l.id === levelId);
   if (!level) {
-    return `אין רמה מספר ${levelId}. באפליקציה יש ${LEVELS.length} רמות (1 עד ${LEVELS.length}).`;
+    return language === 'he'
+      ? `אין רמה מספר ${levelId}. באפליקציה יש ${levels.length} רמות (1 עד ${levels.length}).`
+      : `There's no level ${levelId}. The app has ${levels.length} levels (1 to ${levels.length}).`;
   }
   const cmds = level.steps.map(s => s.commands[s.commands.length - 1]).join(', ');
-  return `רמה ${level.id}: ${level.emoji} ${level.title} - ${level.subtitle}. ${level.steps.length} שלבים, פקודות שנלמדות: ${cmds}.`;
+  return language === 'he'
+    ? `רמה ${level.id}: ${level.emoji} ${level.title} - ${level.subtitle}. ${level.steps.length} שלבים, פקודות שנלמדות: ${cmds}.`
+    : `Level ${level.id}: ${level.emoji} ${level.title} - ${level.subtitle}. ${level.steps.length} steps, commands taught: ${cmds}.`;
 }
 
-function getRandomTip(): string {
-  const allSteps = LEVELS.flatMap(l => l.steps);
+function getRandomTip(language: Language): string {
+  const allSteps = getLevels(language).flatMap(l => l.steps);
   const step = allSteps[Math.floor(Math.random() * allSteps.length)];
-  return `טיפ: ${step.tip}`;
+  return language === 'he' ? `טיפ: ${step.tip}` : `Tip: ${step.tip}`;
 }
 
-function listCommands(): string {
-  return `הפקודות שנלמדות באפליקציה, לפי סדר הרמות: ${KNOWN_COMMANDS.join(', ')}.`;
+function listCommands(language: Language): string {
+  const known = getKnownCommands(language).join(', ');
+  return language === 'he'
+    ? `הפקודות שנלמדות באפליקציה, לפי סדר הרמות: ${known}.`
+    : `Commands taught in the app, in level order: ${known}.`;
 }
 
 // Same four capabilities as the app's src/agent/tools.ts, exposed here as
@@ -40,44 +53,44 @@ function listCommands(): string {
 export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
   {
     name: 'searchCommand',
-    description: 'מחפש מידע על פקודת אילוף ספציפית (למשל שב, עזוב, לידי) ומחזיר טיפ ואת מיקומה באפליקציה.',
+    description: 'Looks up a specific training command (e.g. sit, leave it, heel) and returns a tip and where it appears in the app.',
     input_schema: {
       type: 'object',
       properties: {
-        command: { type: 'string', description: 'שם הפקודה בעברית, בדיוק כפי שהיא מופיעה באפליקציה' },
+        command: { type: 'string', description: 'The command name, exactly as it appears in the app' },
       },
       required: ['command'],
     },
   },
   {
     name: 'getLevelOverview',
-    description: 'מחזיר מידע על רמת אילוף ספציפית לפי מספרה.',
+    description: 'Returns information about a specific training level by number.',
     input_schema: {
       type: 'object',
       properties: {
-        levelId: { type: 'number', description: 'מספר הרמה (1 עד 4)' },
+        levelId: { type: 'number', description: 'The level number (1 to 4)' },
       },
       required: ['levelId'],
     },
   },
   {
     name: 'getRandomTip',
-    description: 'מחזיר טיפ אילוף אקראי אחד מתוך כל הרמות והשלבים.',
+    description: 'Returns one random training tip from across all levels and steps.',
     input_schema: { type: 'object', properties: {} },
   },
   {
     name: 'listCommands',
-    description: 'מחזיר את רשימת כל הפקודות שנלמדות באפליקציה, לפי סדר הרמות.',
+    description: 'Returns the list of every command taught in the app, in level order.',
     input_schema: { type: 'object', properties: {} },
   },
 ];
 
-export function executeTool(name: string, args: Record<string, unknown>): string {
+export function executeTool(name: string, language: Language, args: Record<string, unknown>): string {
   switch (name) {
-    case 'searchCommand': return searchCommand(String(args.command));
-    case 'getLevelOverview': return getLevelOverview(Number(args.levelId));
-    case 'getRandomTip': return getRandomTip();
-    case 'listCommands': return listCommands();
-    default: return `כלי לא מוכר: ${name}`;
+    case 'searchCommand': return searchCommand(language, String(args.command));
+    case 'getLevelOverview': return getLevelOverview(language, Number(args.levelId));
+    case 'getRandomTip': return getRandomTip(language);
+    case 'listCommands': return listCommands(language);
+    default: return language === 'he' ? `כלי לא מוכר: ${name}` : `Unknown tool: ${name}`;
   }
 }

@@ -7,22 +7,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import Confetti from '../components/Confetti';
 import PressableScale from '../components/PressableScale';
-import { LEVELS, Level, C } from '../data';
+import { Level, C } from '../data';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useStrings } from '../i18n/strings';
 
 interface Props {
+  levels: Level[];
   level: Level;
   isLast: boolean;
   onNext: () => void;
   onRestart: () => void;
 }
 
-export default function SuccessScreen({ level, isLast, onNext, onRestart }: Props) {
+export default function SuccessScreen({ levels, level, isLast, onNext, onRestart }: Props) {
+  const { language } = useLanguage();
+  const t = useStrings(language).success;
   const [confetti, setConfetti] = useState(true);
   const scale = useRef(new Animated.Value(0.85)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const trophyScale = useRef(new Animated.Value(0)).current;
 
-  const nextLevel = LEVELS.find(l => l.id === level.id + 1);
+  const nextLevel = levels.find(l => l.id === level.id + 1);
   const successPose =
     level.id === 2 ? 'crate_full' : level.id === 3 ? 'leave_walk' : level.id === 4 ? 'walk_stay' : 'sit';
 
@@ -52,22 +57,22 @@ export default function SuccessScreen({ level, isLast, onNext, onRestart }: Prop
             ))}
           </View>
 
-          <DogScene illustration={successPose} size={260} />
+          <DogScene illustration={successPose} language={language} size={260} />
 
-          <Text style={styles.title}>כל הכבוד!</Text>
+          <Text style={styles.title}>{t.title}</Text>
           <Text style={[styles.sub, { color: level.color }]}>
-            השלמתם את {level.emoji} {level.title}
+            {t.subtitle(level.emoji, level.title)}
           </Text>
           <Text style={styles.body}>
-            הכלב שלכם למד {level.steps.length} שלבים חדשים - אתם צוות מעולה!
+            {t.body(level.steps.length)}
           </Text>
 
           {/* Stats */}
           <View style={styles.stats}>
             {[
-              { label: 'פקודות', val: String(totalCommands), emoji: '🎯' },
-              { label: 'שלבים', val: `${level.steps.length}/${level.steps.length}`, emoji: '📚' },
-              { label: 'כוכבים', val: '⭐⭐⭐', emoji: null },
+              { label: t.statCommands, val: String(totalCommands), emoji: '🎯' },
+              { label: t.statSteps, val: `${level.steps.length}/${level.steps.length}`, emoji: '📚' },
+              { label: t.statStars, val: '⭐⭐⭐', emoji: null },
             ].map(({ label, val, emoji }) => (
               <View key={label} style={[styles.stat, { backgroundColor: level.color + '15' }]}>
                 {emoji && <Text style={styles.statEmoji}>{emoji}</Text>}
@@ -86,12 +91,12 @@ export default function SuccessScreen({ level, isLast, onNext, onRestart }: Prop
               borderColor: nextLevel.colorMid,
             }]}>
               <Text style={[styles.nextText, { color: nextLevel.color }]}>
-                {nextLevel.emoji} הבא: רמה {nextLevel.id} - {nextLevel.title}
+                {t.next(nextLevel.emoji, nextLevel.id, nextLevel.title)}
               </Text>
             </View>
           ) : (
             <View style={styles.doneCard}>
-              <Text style={styles.doneText}>השלמתם את כל הרמות! אלופים אמיתיים!</Text>
+              <Text style={styles.doneText}>{t.allDone}</Text>
             </View>
           )}
 
@@ -102,14 +107,14 @@ export default function SuccessScreen({ level, isLast, onNext, onRestart }: Prop
                 onPress={onNext}
                 style={[styles.nextBtn, { backgroundColor: nextLevel.color }]}
               >
-                <Text style={styles.btnText}>הבא {nextLevel.emoji}</Text>
+                <Text style={styles.btnText}>{t.nextBtn(nextLevel.emoji)}</Text>
               </PressableScale>
             )}
             <PressableScale
               onPress={onRestart}
               style={[styles.restartBtn, { borderColor: level.color }]}
             >
-              <Text style={[styles.restartText, { color: level.color }]}>🔄 שוב</Text>
+              <Text style={[styles.restartText, { color: level.color }]}>{t.restartBtn}</Text>
             </PressableScale>
           </View>
         </Animated.View>

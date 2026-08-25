@@ -4,10 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import PressableScale from '../components/PressableScale';
 import { C } from '../data';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useStrings } from '../i18n/strings';
 
 interface Props { onStart: () => void }
 
 export default function SplashScreen({ onStart }: Props) {
+  const { language } = useLanguage();
+  const t = useStrings(language).splash;
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(30)).current;
 
@@ -22,28 +26,28 @@ export default function SplashScreen({ onStart }: Props) {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.card, { opacity: fade, transform: [{ translateY: slide }] }]}>
-          <DogScene illustration="sit" size={280} />
+          <DogScene illustration="sit" language={language} size={280} />
 
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>אפליקציית האילוף המובילה</Text>
+            <Text style={styles.badgeText}>{t.badge}</Text>
           </View>
 
-          <Text style={styles.title}>מאלפים יחד!</Text>
-          <Text style={styles.subtitle}>מסע האילוף הכי כיף עם הכלב שלכם</Text>
+          <Text style={styles.title}>{t.title}</Text>
+          <Text style={styles.subtitle}>{t.subtitle}</Text>
 
           <View style={styles.tags}>
-            {['קל ללמוד', 'מותאם לילדים', 'שלב אחר שלב'].map(t => (
-              <View key={t} style={styles.tag}>
-                <Text style={styles.tagText}>{t}</Text>
+            {t.tags.map(tag => (
+              <View key={tag} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
               </View>
             ))}
           </View>
 
           <PressableScale style={styles.cta} onPress={onStart}>
-            <Text style={styles.ctaText}>בואו נתחיל לאלף 🚀</Text>
+            <Text style={styles.ctaText}>{t.cta}</Text>
           </PressableScale>
 
-          <Text style={styles.fine}>לא נדרשת הרשמה - חינמי לגמרי</Text>
+          <Text style={styles.fine}>{t.fine}</Text>
         </Animated.View>
       </ScrollView>
     </SafeAreaView>

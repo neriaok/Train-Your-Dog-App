@@ -1,7 +1,9 @@
-// Mirrors the LEVELS content in the app's own src/data.ts. Kept as a plain
-// copy (no shared package/monorepo setup) since this worker is a separate
-// deployable project - if you add or edit a level in the app, copy the
-// updated LEVELS array over here too.
+// Mirrors the localized LEVELS content in the app (src/data.ts +
+// src/i18n/content.ts). Kept as a plain copy (no shared package/monorepo
+// setup) since this worker is a separate deployable project - if you add
+// or edit a level in the app, copy the updated content over here too.
+
+export type Language = 'he' | 'en';
 
 export interface Step {
   id: number;
@@ -18,7 +20,7 @@ export interface Level {
   steps: Step[];
 }
 
-export const LEVELS: Level[] = [
+const LEVELS_HE: Level[] = [
   {
     id: 1,
     title: "פקודות בסיסיות",
@@ -76,3 +78,66 @@ export const LEVELS: Level[] = [
     ],
   },
 ];
+
+const LEVELS_EN: Level[] = [
+  {
+    id: 1,
+    title: "Basic Commands",
+    subtitle: "First Steps",
+    emoji: "🐾",
+    steps: [
+      { id: 1, commands: ["Sit"], emoji: "🪑",
+        tip: "Hold a treat above the dog's head and say Sit in a calm tone. The moment they sit - reward right away!" },
+      { id: 2, commands: ["Come", "Sit"], emoji: "🏃",
+        tip: "Call the dog by name, then say Come. When they arrive, ask for Sit. Practice in an open space." },
+      { id: 3, commands: ["Come", "Sit", "Down"], emoji: "⬇️",
+        tip: "Once the dog is sitting, slowly lower your hand to the floor while saying Down. Be patient!" },
+    ],
+  },
+  {
+    id: 2,
+    title: "Crate Training",
+    subtitle: "Teaching a Resting Place",
+    emoji: "🏠",
+    steps: [
+      { id: 1, commands: ["Place"], emoji: "🏠",
+        tip: "Put a treat inside the crate, point in, and say Place. When they go in and lie down - praise enthusiastically!" },
+      { id: 2, commands: ["Come", "Place"], emoji: "🔄",
+        tip: "Call Come outside the crate, wait for them to arrive, then point to the crate and say Place. Repeat 5 times." },
+      { id: 3, commands: ["Come", "Sit", "Down", "Place"], emoji: "⭐",
+        tip: "A full command sequence! Come, Sit, Down, Place. Great preparation for an evening routine." },
+    ],
+  },
+  {
+    id: 3,
+    title: 'The "Leave It" Command',
+    subtitle: "Self-Control & Resisting Temptation",
+    emoji: "🍖",
+    steps: [
+      { id: 1, commands: ["Leave It"], emoji: "🍖",
+        tip: "Place a treat on the floor. When the dog approaches, say Leave It firmly. When they back off - reward with a different treat!" },
+      { id: 2, commands: ["Leave It"], emoji: "🔄",
+        tip: "Say Leave It, stand still, and turn your back to the dog. Don't walk away! If they hold back - turn around and reward." },
+      { id: 3, commands: ["Leave It"], emoji: "👣",
+        tip: "Only once the dog succeeds at step 2 - take 3 steps back. If they stay - go back to them and reward there." },
+    ],
+  },
+  {
+    id: 4,
+    title: "Leash Walking",
+    subtitle: "Walking Without Pulling",
+    emoji: "🦮",
+    steps: [
+      { id: 1, commands: ["Heel"], emoji: "🔄",
+        tip: "Put on the leash and go for a walk. The moment the dog pulls - stop and start walking the opposite way. Repeat this every time they pull, so they learn they need to follow you." },
+      { id: 2, commands: ["Heel", "Sit"], emoji: "🪑",
+        tip: "Practice the stop-and-reverse twice. Each time you stop, ask the dog to Sit. When they sit without pulling - reward right away with a treat and praise." },
+      { id: 3, commands: ["Heel", "Sit", "Stay"], emoji: "✋",
+        tip: "Practice twice more, and before continuing the walk add the Stay command. This teaches the dog to wait patiently before heading out." },
+    ],
+  },
+];
+
+export function getLevels(language: Language): Level[] {
+  return language === 'en' ? LEVELS_EN : LEVELS_HE;
+}

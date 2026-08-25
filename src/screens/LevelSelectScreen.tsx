@@ -3,15 +3,21 @@ import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProgressBar from '../components/ProgressBar';
 import PressableScale from '../components/PressableScale';
-import { LEVELS, C } from '../data';
+import LanguagePicker from '../components/LanguagePicker';
+import { Level, C } from '../data';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useStrings } from '../i18n/strings';
 
 interface Props {
+  levels: Level[];
   completed: number[];
   onSelect: (id: number) => void;
   onOpenAgent: () => void;
 }
 
-export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: Props) {
+export default function LevelSelectScreen({ levels, completed, onSelect, onOpenAgent }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = useStrings(language).levels;
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
 
@@ -25,18 +31,22 @@ export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={[styles.topRow, { justifyContent: isRTL ? 'flex-start' : 'flex-end' }]}>
+          <LanguagePicker />
+        </View>
+
         <Animated.View style={{ opacity: fade, transform: [{ translateY: slide }] }}>
           <Text style={styles.dog}>🐕</Text>
-          <Text style={styles.title}>בחרו רמה</Text>
-          <Text style={styles.sub}>השלמתם {completed.length} מתוך {LEVELS.length} רמות</Text>
+          <Text style={styles.title}>{t.heading}</Text>
+          <Text style={styles.sub}>{t.progress(completed.length, levels.length)}</Text>
         </Animated.View>
 
         <View style={styles.progressCard}>
-          <ProgressBar value={completed.length} total={LEVELS.length} color={C.orange} />
+          <ProgressBar value={completed.length} total={levels.length} color={C.orange} />
         </View>
 
-        {LEVELS.map((lvl, i) => {
-          const locked = i > 0 && !completed.includes(LEVELS[i - 1].id);
+        {levels.map((lvl, i) => {
+          const locked = i > 0 && !completed.includes(levels[i - 1].id);
           const done = completed.includes(lvl.id);
           return (
             <PressableScale
@@ -52,8 +62,12 @@ export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: 
               ]}
             >
               {done && (
-                <View style={[styles.doneBadge, { backgroundColor: lvl.color }]}>
-                  <Text style={styles.doneBadgeText}>הושלם</Text>
+                <View style={[
+                  styles.doneBadge,
+                  { backgroundColor: lvl.color },
+                  isRTL ? { left: 12 } : { right: 12 },
+                ]}>
+                  <Text style={styles.doneBadgeText}>{t.done}</Text>
                 </View>
               )}
               <View style={styles.cardRow}>
@@ -63,19 +77,19 @@ export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: 
                 ]}>
                   <Text style={styles.iconText}>{locked ? '🔒' : lvl.emoji}</Text>
                 </View>
-                <View style={styles.cardText}>
-                  <Text style={[styles.levelNum, { color: locked ? C.soft : lvl.color }]}>
-                    רמה {lvl.id}
+                <View style={[styles.cardText, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+                  <Text style={[styles.levelNum, { color: locked ? C.soft : lvl.color, textAlign: isRTL ? 'right' : 'left' }]}>
+                    {t.levelLabel(lvl.id)}
                   </Text>
-                  <Text style={[styles.levelTitle, { color: locked ? C.soft : C.text }]}>
+                  <Text style={[styles.levelTitle, { color: locked ? C.soft : C.text, textAlign: isRTL ? 'right' : 'left' }]}>
                     {lvl.title}
                   </Text>
-                  <Text style={styles.levelSub}>
-                    {lvl.subtitle} - {lvl.steps.length} שלבים
+                  <Text style={[styles.levelSub, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    {lvl.subtitle} - {t.stepsCount(lvl.steps.length)}
                   </Text>
                 </View>
                 {!locked && (
-                  <Text style={[styles.arrow, { color: lvl.color }]}>{'\u2190'}</Text>
+                  <Text style={[styles.arrow, { color: lvl.color }]}>{isRTL ? '←' : '→'}</Text>
                 )}
               </View>
             </PressableScale>
@@ -84,9 +98,9 @@ export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: 
 
         <PressableScale onPress={onOpenAgent} scaleTo={0.98} style={styles.agentCard}>
           <Text style={styles.agentEmoji}>🤖</Text>
-          <View style={styles.agentText}>
-            <Text style={styles.agentTitle}>עוזר אילוף</Text>
-            <Text style={styles.agentSub}>שאלו שאלות וקבלו טיפים והדרכה מיידית</Text>
+          <View style={[styles.agentText, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+            <Text style={[styles.agentTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentTitle}</Text>
+            <Text style={[styles.agentSub, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentSub}</Text>
           </View>
         </PressableScale>
       </ScrollView>
@@ -96,7 +110,8 @@ export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: 
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
-  scroll: { padding: 20, paddingTop: 32 },
+  scroll: { padding: 20, paddingTop: 20 },
+  topRow: { flexDirection: 'row', marginBottom: 12 },
   dog: { fontSize: 44, textAlign: 'center', marginBottom: 8 },
   title: {
     fontSize: 26, fontFamily: 'Heebo_800ExtraBold',
@@ -119,7 +134,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10, elevation: 4, overflow: 'hidden',
   },
   doneBadge: {
-    position: 'absolute', top: 12, left: 12, borderRadius: 20,
+    position: 'absolute', top: 12, borderRadius: 20,
     paddingHorizontal: 10, paddingVertical: 3,
   },
   doneBadgeText: { color: 'white', fontSize: 11, fontFamily: 'Heebo_700Bold' },
@@ -129,7 +144,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   iconText: { fontSize: 28 },
-  cardText: { flex: 1, alignItems: 'flex-end' },
+  cardText: { flex: 1 },
   levelNum: { fontSize: 11, fontFamily: 'Heebo_600SemiBold', marginBottom: 3 },
   levelTitle: { fontSize: 17, fontFamily: 'Heebo_800ExtraBold', marginBottom: 3 },
   levelSub: { fontSize: 13, color: C.soft, fontFamily: 'Heebo_400Regular' },
@@ -140,7 +155,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: C.purple + '40', marginTop: 4,
   },
   agentEmoji: { fontSize: 30 },
-  agentText: { flex: 1, alignItems: 'flex-end' },
+  agentText: { flex: 1 },
   agentTitle: { fontSize: 15, fontFamily: 'Heebo_800ExtraBold', color: C.purple, marginBottom: 2 },
-  agentSub: { fontSize: 12, color: C.soft, fontFamily: 'Heebo_400Regular', textAlign: 'right' },
+  agentSub: { fontSize: 12, color: C.soft, fontFamily: 'Heebo_400Regular' },
 });

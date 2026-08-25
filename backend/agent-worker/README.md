@@ -13,7 +13,10 @@ planner already produces (`thinking` / `tool_call` / `tool_result` /
 `final`) - so the chat screen doesn't need any changes when you switch it
 on. Internally it runs the real Claude tool-use loop (`src/index.ts`)
 against the same four tools the mock planner has (`src/tools.ts`), reading
-from a copy of the app's `LEVELS` data (`src/data.ts`).
+from a copy of the app's localized level content (`src/data.ts` here -
+mirrors `src/data.ts` + `src/i18n/content.ts` in the app). The request body
+also carries a `language: 'he' | 'en'` field so the worker answers in
+whichever language the app is currently set to.
 
 ## One-time setup
 
@@ -74,6 +77,9 @@ for much cheaper testing while you're getting this running.
 
 ## Keeping level data in sync
 
-`src/data.ts` here is a plain copy of the app's `src/data.ts` `LEVELS`
-array (no shared package between the two projects). If you add or edit a
-level in the app, copy the updated array over here too.
+`src/data.ts` here is a plain copy of the app's localized level content
+(no shared package between the two projects) - `getLevels('he' | 'en')`
+mirrors `LEVEL_SKELETONS` in the app's `src/data.ts` merged with the `he`/
+`en` entries in `src/i18n/content.ts`. If you add or edit a level (or a
+translation) in the app, copy the updated content over here too, for both
+languages.

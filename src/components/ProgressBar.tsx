@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useStrings } from '../i18n/strings';
 
 interface Props {
   value: number;
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export default function ProgressBar({ value, total, color }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = useStrings(language).levels;
   const pct = Math.round((value / total) * 100);
   const widthAnim = useRef(new Animated.Value(0)).current;
 
@@ -28,10 +32,10 @@ export default function ProgressBar({ value, total, color }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <Text style={styles.label}>התקדמות</Text>
+        <Text style={styles.label}>{t.progressLabel}</Text>
         <Text style={[styles.pct, { color }]}>{pct}%</Text>
       </View>
-      <View style={[styles.track, { backgroundColor: color + '22' }]}>
+      <View style={[styles.track, { backgroundColor: color + '22', direction: isRTL ? 'rtl' : 'ltr' }]}>
         <Animated.View style={[styles.fill, { width, backgroundColor: color }]} />
       </View>
     </View>
