@@ -85,8 +85,8 @@ export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: 
         <PressableScale onPress={onOpenAgent} scaleTo={0.98} style={styles.agentCard}>
           <Text style={styles.agentEmoji}>🤖</Text>
           <View style={styles.agentText}>
-            <Text style={styles.agentTitle}>עוזר אילוף (דמו)</Text>
-            <Text style={styles.agentSub}>שאלו שאלות וקבלו תשובות - סימולציה לימודית של סוכן AI</Text>
+            <Text style={styles.agentTitle}>עוזר אילוף</Text>
+            <Text style={styles.agentSub}>שאלו שאלות וקבלו טיפים והדרכה מיידית</Text>
           </View>
         </PressableScale>
       </ScrollView>

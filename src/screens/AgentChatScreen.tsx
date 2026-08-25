@@ -5,7 +5,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableScale from '../components/PressableScale';
-import { runAgent, AgentStep } from '../agent/mockAgent';
+import { runAgent } from '../agent/runAgent';
+import { AgentStep, AgentMessage } from '../agent/types';
 import { C } from '../data';
 
 interface Props { onBack: () => void; }
@@ -16,7 +17,7 @@ type ChatEntry =
 
 const INTRO_STEP: AgentStep = {
   type: 'final',
-  text: 'שלום! אני עוזר האילוף (דמו לימודי, בלי חיבור אמיתי ל-AI). שאל אותי על פקודה, על רמה, או בקש "טיפ"!',
+  text: 'שלום! אני עוזר האילוף. שאל אותי על פקודה, על רמה, או בקש "טיפ"!',
 };
 
 export default function AgentChatScreen({ onBack }: Props) {
@@ -24,21 +25,29 @@ export default function AgentChatScreen({ onBack }: Props) {
   const [entries, setEntries] = useState<ChatEntry[]>([
     { id: 'intro', kind: 'step', step: INTRO_STEP },
   ]);
+  const historyRef = useRef<AgentMessage[]>([]);
   const scrollRef = useRef<ScrollView>(null);
 
-  const send = () => {
+  const send = async () => {
     const text = input.trim();
     if (!text) return;
     setInput('');
     setEntries(prev => [...prev, { id: `u-${Date.now()}`, kind: 'user', text }]);
 
-    const steps = runAgent(text);
+    const steps = await runAgent(text, historyRef.current);
     steps.forEach((step, i) => {
       setTimeout(() => {
         setEntries(prev => [...prev, { id: `a-${Date.now()}-${i}`, kind: 'step', step }]);
         requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
       }, (i + 1) * 550);
     });
+
+    const finalStep = steps.find(s => s.type === 'final');
+    historyRef.current = [
+      ...historyRef.current,
+      { role: 'user', content: text },
+      { role: 'assistant', content: finalStep?.text ?? '' },
+    ];
   };
 
   return (
@@ -48,11 +57,6 @@ export default function AgentChatScreen({ onBack }: Props) {
           <Text style={styles.backText}>{'→'} חזרה</Text>
         </PressableScale>
         <Text style={styles.title}>🤖 עוזר אילוף</Text>
-      </View>
-      <View style={styles.disclaimer}>
-        <Text style={styles.disclaimerText}>
-          דימוי לימודי של סוכן AI - כל התשובות מבוססות על לוגיקה קבועה-מראש, בלי חיבור אמיתי ל-API
-        </Text>
       </View>
 
       <KeyboardAvoidingView
@@ -142,14 +146,6 @@ const styles = StyleSheet.create({
   },
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
   title: { fontSize: 18, fontFamily: 'Heebo_800ExtraBold', color: C.text },
-  disclaimer: {
-    marginHorizontal: 20, marginBottom: 8, padding: 10,
-    backgroundColor: C.purpleL, borderRadius: 12,
-  },
-  disclaimerText: {
-    fontSize: 11, fontFamily: 'Heebo_500Medium', color: C.purple,
-    textAlign: 'center', lineHeight: 16,
-  },
   scroll: { padding: 16, paddingBottom: 24, gap: 8 },
   userRow: { alignItems: 'flex-end' },
   userBubble: {

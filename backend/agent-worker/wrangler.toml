@@ -1,0 +1,6 @@
+name = "dog-training-agent"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+# The real secret is NOT set here - run:
+#   wrangler secret put ANTHROPIC_API_KEY

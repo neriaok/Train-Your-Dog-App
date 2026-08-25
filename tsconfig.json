@@ -4,5 +4,6 @@
     "strict": true,
     "moduleResolution": "bundler",
     "paths": { "@/*": ["./src/*"] }
-  }
+  },
+  "exclude": ["node_modules", "backend"]
 }
