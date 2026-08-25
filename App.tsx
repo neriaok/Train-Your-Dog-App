@@ -11,10 +11,11 @@ import SplashScreenComp from './src/screens/SplashScreen';
 import LevelSelectScreen from './src/screens/LevelSelectScreen';
 import StepScreen from './src/screens/StepScreen';
 import SuccessScreen from './src/screens/SuccessScreen';
+import AgentChatScreen from './src/screens/AgentChatScreen';
 
 SplashScreen.preventAutoHideAsync();
 
-type Screen = 'splash' | 'levels' | 'step' | 'success';
+type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent';
 
 const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
 
@@ -94,6 +95,7 @@ export default function App() {
 
   const handleRestart = () => { setStepIdx(0); setScreen('step'); };
   const handleBack = () => setScreen('levels');
+  const handleOpenAgent = () => setScreen('agent');
 
   return (
     <SafeAreaProvider>
@@ -101,7 +103,10 @@ export default function App() {
         <StatusBar style="dark" />
         <Animated.View style={{ flex: 1, opacity: screenFade }}>
           {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
-          {screen === 'levels' && <LevelSelectScreen completed={completed} onSelect={handleSelect} />}
+          {screen === 'levels' && (
+            <LevelSelectScreen completed={completed} onSelect={handleSelect} onOpenAgent={handleOpenAgent} />
+          )}
+          {screen === 'agent' && <AgentChatScreen onBack={handleBack} />}
           {screen === 'step' && level && step && (
             <StepScreen
               key={`${levelId}-${stepIdx}`}

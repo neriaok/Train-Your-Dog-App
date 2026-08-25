@@ -8,9 +8,10 @@ import { LEVELS, C } from '../data';
 interface Props {
   completed: number[];
   onSelect: (id: number) => void;
+  onOpenAgent: () => void;
 }
 
-export default function LevelSelectScreen({ completed, onSelect }: Props) {
+export default function LevelSelectScreen({ completed, onSelect, onOpenAgent }: Props) {
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
 
@@ -80,6 +81,14 @@ export default function LevelSelectScreen({ completed, onSelect }: Props) {
             </PressableScale>
           );
         })}
+
+        <PressableScale onPress={onOpenAgent} scaleTo={0.98} style={styles.agentCard}>
+          <Text style={styles.agentEmoji}>🤖</Text>
+          <View style={styles.agentText}>
+            <Text style={styles.agentTitle}>עוזר אילוף (דמו)</Text>
+            <Text style={styles.agentSub}>שאלו שאלות וקבלו תשובות - סימולציה לימודית של סוכן AI</Text>
+          </View>
+        </PressableScale>
       </ScrollView>
     </SafeAreaView>
   );
@@ -125,4 +134,13 @@ const styles = StyleSheet.create({
   levelTitle: { fontSize: 17, fontFamily: 'Heebo_800ExtraBold', marginBottom: 3 },
   levelSub: { fontSize: 13, color: C.soft, fontFamily: 'Heebo_400Regular' },
   arrow: { fontSize: 16 },
+  agentCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: C.purpleL, borderRadius: 20, padding: 16,
+    borderWidth: 1.5, borderColor: C.purple + '40', marginTop: 4,
+  },
+  agentEmoji: { fontSize: 30 },
+  agentText: { flex: 1, alignItems: 'flex-end' },
+  agentTitle: { fontSize: 15, fontFamily: 'Heebo_800ExtraBold', color: C.purple, marginBottom: 2 },
+  agentSub: { fontSize: 12, color: C.soft, fontFamily: 'Heebo_400Regular', textAlign: 'right' },
 });
