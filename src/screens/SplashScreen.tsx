@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import PressableScale from '../components/PressableScale';
+import LanguagePicker from '../components/LanguagePicker';
 import { C } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
@@ -10,7 +11,7 @@ import { useStrings } from '../i18n/strings';
 interface Props { onStart: () => void }
 
 export default function SplashScreen({ onStart }: Props) {
-  const { language } = useLanguage();
+  const { language, isRTL } = useLanguage();
   const t = useStrings(language).splash;
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(30)).current;
@@ -24,6 +25,9 @@ export default function SplashScreen({ onStart }: Props) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <View style={[styles.topRow, { justifyContent: isRTL ? 'flex-start' : 'flex-end' }]}>
+        <LanguagePicker />
+      </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.card, { opacity: fade, transform: [{ translateY: slide }] }]}>
           <DogScene illustration="sit" language={language} size={280} />
@@ -56,6 +60,7 @@ export default function SplashScreen({ onStart }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
+  topRow: { flexDirection: 'row', paddingHorizontal: 20, paddingTop: 12 },
   scroll: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   card: {
     backgroundColor: C.white, borderRadius: 32, padding: 28,
