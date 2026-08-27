@@ -1,0 +1,16 @@
+name = "dog-training-payments"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Set these secrets before deploying:
+#   wrangler secret put STRIPE_SECRET_KEY
+#   wrangler secret put STRIPE_WEBHOOK_SECRET
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#
+# Plain (non-secret) config:
+[vars]
+SUPABASE_URL = ""            # same project URL as src/auth/supabaseClient.ts
+STRIPE_PRICE_ID = ""         # the Price ID of your premium plan in Stripe
+APP_SUCCESS_URL = ""         # where Stripe redirects after a successful payment
+APP_CANCEL_URL = ""          # where Stripe redirects if the user cancels

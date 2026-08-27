@@ -7,17 +7,21 @@ import LanguagePicker from '../components/LanguagePicker';
 import { Level, C } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
+import { useAuth } from '../auth/AuthContext';
 
 interface Props {
   levels: Level[];
   completed: number[];
   onSelect: (id: number) => void;
   onOpenAgent: () => void;
+  onOpenAuth: () => void;
+  onOpenUpgrade: () => void;
 }
 
-export default function LevelSelectScreen({ levels, completed, onSelect, onOpenAgent }: Props) {
+export default function LevelSelectScreen({ levels, completed, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).levels;
+  const { accountsEnabled, user, isPremium, signOut } = useAuth();
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
 
@@ -32,6 +36,19 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[styles.topRow, { justifyContent: isRTL ? 'flex-start' : 'flex-end' }]}>
+          {accountsEnabled && (
+            user ? (
+              <PressableScale onPress={signOut} style={styles.accountBtn}>
+                <Text style={styles.accountBtnText} numberOfLines={1}>
+                  {isPremium ? '👑 ' : ''}{user.email} · {t.signOut}
+                </Text>
+              </PressableScale>
+            ) : (
+              <PressableScale onPress={onOpenAuth} style={styles.accountBtn}>
+                <Text style={styles.accountBtnText}>{t.signIn}</Text>
+              </PressableScale>
+            )
+          )}
           <LanguagePicker />
         </View>
 
@@ -47,18 +64,20 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
 
         {levels.map((lvl, i) => {
           const locked = i > 0 && !completed.includes(levels[i - 1].id);
+          const premiumLocked = !locked && lvl.id > 1 && !isPremium;
           const done = completed.includes(lvl.id);
           return (
             <PressableScale
               key={lvl.id}
-              onPress={() => onSelect(lvl.id)}
+              onPress={() => (premiumLocked ? onOpenUpgrade() : onSelect(lvl.id))}
               disabled={locked}
               scaleTo={0.98}
               style={[
                 styles.card,
                 done ? { borderColor: lvl.color, borderWidth: 2 } :
                   locked ? { borderColor: C.border, borderWidth: 2, backgroundColor: '#F9F9F9' } :
-                    { borderColor: lvl.color + '40', borderWidth: 2 },
+                    premiumLocked ? { borderColor: C.purple + '40', borderWidth: 2 } :
+                      { borderColor: lvl.color + '40', borderWidth: 2 },
               ]}
             >
               {done && (
@@ -70,15 +89,24 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
                   <Text style={styles.doneBadgeText}>{t.done}</Text>
                 </View>
               )}
+              {!done && premiumLocked && (
+                <View style={[
+                  styles.doneBadge,
+                  { backgroundColor: C.purple },
+                  isRTL ? { left: 12 } : { right: 12 },
+                ]}>
+                  <Text style={styles.doneBadgeText}>{t.premiumBadge}</Text>
+                </View>
+              )}
               <View style={styles.cardRow}>
                 <View style={[
                   styles.iconBox,
-                  { backgroundColor: locked ? C.border : lvl.color + '22' }
+                  { backgroundColor: locked ? C.border : premiumLocked ? C.purpleL : lvl.color + '22' }
                 ]}>
-                  <Text style={styles.iconText}>{locked ? '🔒' : lvl.emoji}</Text>
+                  <Text style={styles.iconText}>{locked ? '🔒' : premiumLocked ? '👑' : lvl.emoji}</Text>
                 </View>
                 <View style={[styles.cardText, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-                  <Text style={[styles.levelNum, { color: locked ? C.soft : lvl.color, textAlign: isRTL ? 'right' : 'left' }]}>
+                  <Text style={[styles.levelNum, { color: locked ? C.soft : premiumLocked ? C.purple : lvl.color, textAlign: isRTL ? 'right' : 'left' }]}>
                     {t.levelLabel(lvl.id)}
                   </Text>
                   <Text style={[styles.levelTitle, { color: locked ? C.soft : C.text, textAlign: isRTL ? 'right' : 'left' }]}>
@@ -89,7 +117,7 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
                   </Text>
                 </View>
                 {!locked && (
-                  <Text style={[styles.arrow, { color: lvl.color }]}>{isRTL ? '←' : '→'}</Text>
+                  <Text style={[styles.arrow, { color: premiumLocked ? C.purple : lvl.color }]}>{isRTL ? '←' : '→'}</Text>
                 )}
               </View>
             </PressableScale>
@@ -111,7 +139,12 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   scroll: { padding: 20, paddingTop: 20 },
-  topRow: { flexDirection: 'row', marginBottom: 12 },
+  topRow: { flexDirection: 'row', marginBottom: 12, gap: 8, alignItems: 'center' },
+  accountBtn: {
+    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6, maxWidth: 220,
+  },
+  accountBtnText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.text },
   dog: { fontSize: 44, textAlign: 'center', marginBottom: 8 },
   title: {
     fontSize: 26, fontFamily: 'Heebo_800ExtraBold',

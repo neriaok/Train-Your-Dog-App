@@ -11,17 +11,21 @@ import LevelSelectScreen from './src/screens/LevelSelectScreen';
 import StepScreen from './src/screens/StepScreen';
 import SuccessScreen from './src/screens/SuccessScreen';
 import AgentChatScreen from './src/screens/AgentChatScreen';
+import AuthScreen from './src/screens/AuthScreen';
+import UpgradeScreen from './src/screens/UpgradeScreen';
 import { LanguageProvider, useLanguage } from './src/i18n/LanguageContext';
 import { useLevels } from './src/i18n/useLevels';
+import { AuthProvider, useAuth } from './src/auth/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
-type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent';
+type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent' | 'auth' | 'upgrade';
 
 const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
 
 function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const { isRTL, ready: languageReady } = useLanguage();
+  const { ready: authReady, isPremium } = useAuth();
   const LEVELS = useLevels();
 
   const [screen, setScreen] = useState<Screen>('splash');
@@ -56,7 +60,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
     Animated.timing(screenFade, { toValue: 1, duration: 350, useNativeDriver: true }).start();
   }, [screen]);
 
-  if (!progressLoaded || !languageReady) return null;
+  if (!progressLoaded || !languageReady || !authReady) return null;
 
   const level = LEVELS.find(l => l.id === levelId)!;
   const step = level?.steps[stepIdx];
@@ -64,6 +68,10 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const handleStart = () => setScreen('levels');
 
   const handleSelect = (id: number) => {
+    if (id > 1 && !isPremium) {
+      setScreen('upgrade');
+      return;
+    }
     setLevelId(id);
     setStepIdx(0);
     setScreen('step');
@@ -81,13 +89,15 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
 
   const handleNext = () => {
     const next = LEVELS.find(l => l.id === levelId + 1);
-    if (next) { setLevelId(next.id); setStepIdx(0); setScreen('step'); }
+    if (next && (next.id === 1 || isPremium)) { setLevelId(next.id); setStepIdx(0); setScreen('step'); }
     else setScreen('levels');
   };
 
   const handleRestart = () => { setStepIdx(0); setScreen('step'); };
   const handleBack = () => setScreen('levels');
   const handleOpenAgent = () => setScreen('agent');
+  const handleOpenAuth = () => setScreen('auth');
+  const handleOpenUpgrade = () => setScreen('upgrade');
 
   return (
     <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
@@ -95,9 +105,15 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
       <Animated.View style={{ flex: 1, opacity: screenFade }}>
         {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
         {screen === 'levels' && (
-          <LevelSelectScreen levels={LEVELS} completed={completed} onSelect={handleSelect} onOpenAgent={handleOpenAgent} />
+          <LevelSelectScreen
+            levels={LEVELS} completed={completed}
+            onSelect={handleSelect} onOpenAgent={handleOpenAgent}
+            onOpenAuth={handleOpenAuth} onOpenUpgrade={handleOpenUpgrade}
+          />
         )}
         {screen === 'agent' && <AgentChatScreen levels={LEVELS} onBack={handleBack} />}
+        {screen === 'auth' && <AuthScreen onBack={handleBack} onAuthed={handleBack} />}
+        {screen === 'upgrade' && <UpgradeScreen onBack={handleBack} onSignInRequired={handleOpenAuth} />}
         {screen === 'step' && level && step && (
           <StepScreen
             key={`${levelId}-${stepIdx}`}
@@ -138,7 +154,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <LanguageProvider>
-        <AppInner onLayoutRootView={onLayoutRootView} />
+        <AuthProvider>
+          <AppInner onLayoutRootView={onLayoutRootView} />
+        </AuthProvider>
       </LanguageProvider>
     </SafeAreaProvider>
   );
