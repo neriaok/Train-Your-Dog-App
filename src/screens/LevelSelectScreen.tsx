@@ -21,7 +21,7 @@ interface Props {
 export default function LevelSelectScreen({ levels, completed, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).levels;
-  const { accountsEnabled, user, isPremium, signOut } = useAuth();
+  const { user, isPremium, signOut } = useAuth();
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
 
@@ -36,18 +36,16 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[styles.topRow, { justifyContent: isRTL ? 'flex-start' : 'flex-end' }]}>
-          {accountsEnabled && (
-            user ? (
-              <PressableScale onPress={signOut} style={styles.accountBtn}>
-                <Text style={styles.accountBtnText} numberOfLines={1}>
-                  {isPremium ? '👑 ' : ''}{user.email} · {t.signOut}
-                </Text>
-              </PressableScale>
-            ) : (
-              <PressableScale onPress={onOpenAuth} style={styles.accountBtn}>
-                <Text style={styles.accountBtnText}>{t.signIn}</Text>
-              </PressableScale>
-            )
+          {user ? (
+            <PressableScale onPress={signOut} style={styles.accountBtn}>
+              <Text style={styles.accountBtnText} numberOfLines={1}>
+                {isPremium ? '👑 ' : ''}{user.email} · {t.signOut}
+              </Text>
+            </PressableScale>
+          ) : (
+            <PressableScale onPress={onOpenAuth} style={styles.accountBtn}>
+              <Text style={styles.accountBtnText}>{t.signIn}</Text>
+            </PressableScale>
           )}
           <LanguagePicker />
         </View>

@@ -9,8 +9,11 @@ import { C } from '../data';
 
 /**
  * Fill this in with your deployed backend/payments-worker URL to let this
- * screen create real Stripe Checkout sessions. Leave empty and the
- * "Upgrade" button just shows a "coming soon" message - nothing breaks.
+ * screen create real Stripe Checkout sessions. Leave empty and, once
+ * accounts are also real (Supabase configured), the button just shows a
+ * "coming soon" message. Until then (mock accounts - the default), the
+ * button simulates a purchase locally so the whole flow can be seen and
+ * tried without any backend or real charge - see src/auth/mockAuth.ts.
  * Setup steps: backend/payments-worker/README.md
  */
 export const PAYMENTS_BACKEND_URL = '';
@@ -24,13 +27,19 @@ interface Props { onBack: () => void; onSignInRequired: () => void; }
 export default function UpgradeScreen({ onBack, onSignInRequired }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).upgrade;
-  const { user } = useAuth();
+  const { user, isMock, isPremium, upgradeToPremium, downgradeFromPremium } = useAuth();
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const handleUpgrade = async () => {
     if (!user) {
       onSignInRequired();
+      return;
+    }
+    if (isMock) {
+      setBusy(true);
+      await upgradeToPremium();
+      setBusy(false);
       return;
     }
     if (!isPaymentsConfigured()) {
@@ -54,6 +63,12 @@ export default function UpgradeScreen({ onBack, onSignInRequired }: Props) {
     }
   };
 
+  const handleDowngrade = async () => {
+    setBusy(true);
+    await downgradeFromPremium();
+    setBusy(false);
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
@@ -70,10 +85,22 @@ export default function UpgradeScreen({ onBack, onSignInRequired }: Props) {
 
           {notice && <Text style={styles.notice}>{notice}</Text>}
 
-          {user ? (
-            <PressableScale onPress={handleUpgrade} disabled={busy} style={styles.upgradeBtn}>
-              <Text style={styles.upgradeText}>{busy ? '...' : t.upgradeBtn}</Text>
-            </PressableScale>
+          {user && isPremium ? (
+            <>
+              <Text style={styles.premiumNotice}>{t.alreadyPremium}</Text>
+              {isMock && (
+                <PressableScale onPress={handleDowngrade} disabled={busy} style={styles.downgradeBtn}>
+                  <Text style={styles.downgradeText}>{busy ? '...' : t.downgradeBtn}</Text>
+                </PressableScale>
+              )}
+            </>
+          ) : user ? (
+            <>
+              <PressableScale onPress={handleUpgrade} disabled={busy} style={styles.upgradeBtn}>
+                <Text style={styles.upgradeText}>{busy ? '...' : t.upgradeBtn}</Text>
+              </PressableScale>
+              {isMock && <Text style={styles.demoNote}>{t.demoNote}</Text>}
+            </>
           ) : (
             <>
               <Text style={styles.notice}>{t.needSignIn}</Text>
@@ -117,9 +144,23 @@ const styles = StyleSheet.create({
     fontSize: 12, color: C.purple, fontFamily: 'Heebo_500Medium',
     textAlign: 'center', marginBottom: 14,
   },
+  premiumNotice: {
+    fontSize: 15, color: C.purple, fontFamily: 'Heebo_800ExtraBold',
+    textAlign: 'center', marginBottom: 14,
+  },
+  demoNote: {
+    fontSize: 11, color: C.soft, fontFamily: 'Heebo_400Regular',
+    textAlign: 'center', marginTop: 10,
+  },
   upgradeBtn: {
     backgroundColor: C.purple, borderRadius: 16, paddingVertical: 16,
     paddingHorizontal: 32, alignItems: 'center', width: '100%', marginTop: 4,
   },
   upgradeText: { color: 'white', fontSize: 16, fontFamily: 'Heebo_800ExtraBold' },
+  downgradeBtn: {
+    borderRadius: 16, paddingVertical: 13, paddingHorizontal: 32,
+    alignItems: 'center', width: '100%', marginTop: 4,
+    borderWidth: 1.5, borderColor: C.border,
+  },
+  downgradeText: { color: C.soft, fontSize: 13, fontFamily: 'Heebo_600SemiBold' },
 });

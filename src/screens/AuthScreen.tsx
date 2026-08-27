@@ -15,7 +15,7 @@ interface Props { onBack: () => void; onAuthed: () => void; }
 export default function AuthScreen({ onBack, onAuthed }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).auth;
-  const { signIn, signUp } = useAuth();
+  const { isMock, signIn, signUp } = useAuth();
 
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const [email, setEmail] = useState('');
@@ -34,7 +34,10 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
       setError(result.error);
       return;
     }
-    if (mode === 'signUp') {
+    if (mode === 'signUp' && !isMock) {
+      // Real Supabase requires email verification before the session is
+      // usable - mock sign-up already signs the user in immediately, so
+      // it falls through to onAuthed() below like sign-in does.
       setNotice(t.signUpSuccess);
       setMode('signIn');
     } else {

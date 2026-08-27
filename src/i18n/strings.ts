@@ -46,6 +46,9 @@ export const STRINGS = {
       needSignIn: 'צריך להתחבר קודם כדי לשדרג.',
       signInBtn: 'התחברות',
       back: 'חזרה',
+      demoNote: 'מצב הדגמה - לא יבוצע חיוב אמיתי',
+      alreadyPremium: 'את/ה כבר במסלול פרימיום! 👑',
+      downgradeBtn: 'בטל שדרוג (לבדיקה)',
     },
     step: {
       back: 'חזרה',
@@ -130,6 +133,9 @@ export const STRINGS = {
       needSignIn: 'You need to sign in before upgrading.',
       signInBtn: 'Sign In',
       back: 'Back',
+      demoNote: 'Demo mode - no real charge will be made',
+      alreadyPremium: "You're already on Premium! 👑",
+      downgradeBtn: 'Cancel upgrade (for testing)',
     },
     step: {
       back: 'Back',

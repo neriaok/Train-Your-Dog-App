@@ -15,9 +15,15 @@ create policy "Users can view their own profile"
   on public.profiles for select
   using (auth.uid() = id);
 
-create policy "Users can update their own profile"
-  on public.profiles for update
-  using (auth.uid() = id);
+-- Deliberately no UPDATE policy for regular users: Postgres row-level
+-- security policies apply per-row, not per-column, so an "update your own
+-- row" policy would let a signed-in user set is_premium = true on
+-- themselves via the client SDK - handing out free premium. The app has
+-- no other profile fields users need to self-edit today, so the simplest
+-- safe answer is no client-side UPDATE at all. is_premium is only ever
+-- written server-side, with the service role key (bypasses RLS) - either
+-- by hand via the Table Editor for testing, or by backend/payments-worker
+-- once real payments are wired up.
 
 -- Auto-create a profile row whenever someone signs up.
 create or replace function public.handle_new_user()
@@ -33,10 +39,5 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- Note: `is_premium` is intentionally NOT updatable by the user's own RLS
--- policy above (only select/update as themselves is granted, and the app
--- never writes to is_premium client-side). Until real payments are wired
--- up (see backend/payments-worker), flip a user to premium manually for
--- testing: Table Editor -> profiles -> edit the is_premium cell. Once
--- payments go live, the payments worker updates it server-side with the
--- Supabase service role key, which bypasses RLS.
+-- To try the premium experience by hand before real payments exist:
+-- Table Editor -> profiles -> edit the is_premium cell for your test user.

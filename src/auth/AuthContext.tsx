@@ -1,42 +1,52 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import type { Session, User } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
+import { mockLoadState, mockSignUp, mockSignIn, mockSignOut, mockSetPremium, MOCK_USER_ID } from './mockAuth';
 
-export interface Profile {
+export interface AppUser {
   id: string;
   email: string | null;
-  is_premium: boolean;
 }
 
 interface AuthContextValue {
   ready: boolean;
-  accountsEnabled: boolean;
-  user: User | null;
-  profile: Profile | null;
+  /** true when running on the local, no-backend mock account (see mockAuth.ts) */
+  isMock: boolean;
+  user: AppUser | null;
   isPremium: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  /** Mock mode only - simulates a successful purchase, no real charge. */
+  upgradeToPremium: () => Promise<void>;
+  /** Mock mode only - lets you flip back to the free plan to re-test the paywall. */
+  downgradeFromPremium: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
-  ready: true,
-  accountsEnabled: false,
+  ready: false,
+  isMock: true,
   user: null,
-  profile: null,
-  isPremium: true, // no accounts configured -> every level behaves as free/open
-  signUp: async () => ({ error: 'Accounts are not enabled yet' }),
-  signIn: async () => ({ error: 'Accounts are not enabled yet' }),
+  isPremium: false,
+  signUp: async () => ({ error: null }),
+  signIn: async () => ({ error: null }),
   signOut: async () => {},
-  refreshProfile: async () => {},
+  upgradeToPremium: async () => {},
+  downgradeFromPremium: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const accountsEnabled = isSupabaseConfigured();
-  const [ready, setReady] = useState(!accountsEnabled);
+  const isMock = !isSupabaseConfigured();
+  const [ready, setReady] = useState(false);
+
+  // Real (Supabase) state
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<{ is_premium: boolean } | null>(null);
+
+  // Mock state
+  const [mockSignedIn, setMockSignedIn] = useState(false);
+  const [mockEmail, setMockEmail] = useState<string | null>(null);
+  const [mockPremium, setMockPremium] = useState(false);
 
   const loadProfile = async (userId: string) => {
     if (!supabase) return;
@@ -45,11 +55,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select('id, email, is_premium')
       .eq('id', userId)
       .single();
-    if (data) setProfile(data as Profile);
+    if (data) setProfile(data as { is_premium: boolean });
   };
 
   useEffect(() => {
-    if (!accountsEnabled || !supabase) return;
+    if (isMock) {
+      mockLoadState().then(({ signedIn, account }) => {
+        setMockSignedIn(signedIn);
+        setMockEmail(account?.email ?? null);
+        setMockPremium(account?.isPremium ?? false);
+        setReady(true);
+      });
+      return;
+    }
+
+    if (!supabase) return;
 
     supabase.auth.getSession()
       .then(({ data }) => {
@@ -69,44 +89,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => listener.subscription.unsubscribe();
-  }, [accountsEnabled]);
+  }, [isMock]);
 
   const signUp = async (email: string, password: string) => {
+    if (isMock) {
+      const result = await mockSignUp(email, password);
+      if (!result.error) {
+        setMockSignedIn(true);
+        setMockEmail(email);
+        setMockPremium(false);
+      }
+      return result;
+    }
     if (!supabase) return { error: 'Accounts are not enabled yet' };
     const { error } = await supabase.auth.signUp({ email, password });
     return { error: error?.message ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
+    if (isMock) {
+      const result = await mockSignIn(email, password);
+      if (!result.error) {
+        setMockSignedIn(true);
+        setMockEmail(email);
+        const { account } = await mockLoadState();
+        setMockPremium(account?.isPremium ?? false);
+      }
+      return result;
+    }
     if (!supabase) return { error: 'Accounts are not enabled yet' };
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
+    if (isMock) {
+      await mockSignOut();
+      setMockSignedIn(false);
+      return;
+    }
     if (!supabase) return;
     await supabase.auth.signOut();
   };
 
-  const refreshProfile = async () => {
-    if (session) await loadProfile(session.user.id);
+  const upgradeToPremium = async () => {
+    if (!isMock) return;
+    await mockSetPremium(true);
+    setMockPremium(true);
   };
 
-  const isPremium = accountsEnabled ? profile?.is_premium ?? false : true;
+  const downgradeFromPremium = async () => {
+    if (!isMock) return;
+    await mockSetPremium(false);
+    setMockPremium(false);
+  };
+
+  const user: AppUser | null = isMock
+    ? (mockSignedIn ? { id: MOCK_USER_ID, email: mockEmail } : null)
+    : (session ? { id: session.user.id, email: session.user.email ?? null } : null);
+
+  const isPremium = isMock ? mockPremium : (profile?.is_premium ?? false);
 
   return (
     <AuthContext.Provider
-      value={{
-        ready,
-        accountsEnabled,
-        user: session?.user ?? null,
-        profile,
-        isPremium,
-        signUp,
-        signIn,
-        signOut,
-        refreshProfile,
-      }}
+      value={{ ready, isMock, user, isPremium, signUp, signIn, signOut, upgradeToPremium, downgradeFromPremium }}
     >
       {children}
     </AuthContext.Provider>
