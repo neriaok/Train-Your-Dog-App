@@ -21,12 +21,11 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailFocused, setEmailFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const showSavedAccount = isMock && mode === 'signIn' && emailFocused && email.trim() === '';
+  const showSavedAccount = isMock && mode === 'signIn' && email.trim() === '';
 
   const handleQuickSignIn = async () => {
     setBusy(true);
@@ -83,36 +82,33 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
               </PressableScale>
             </View>
 
-            <View>
-              <TextInput
-                style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
-                value={email}
-                onChangeText={setEmail}
-                onFocus={() => setEmailFocused(true)}
-                placeholder={t.email}
-                placeholderTextColor={C.soft}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-              {showSavedAccount && (
-                <PressableScale onPress={handleQuickSignIn} disabled={busy} style={styles.suggestion}>
-                  <Text style={styles.suggestionIcon}>👤</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.suggestionName, { textAlign: isRTL ? 'right' : 'left' }]}>
-                      {BUILT_IN_ACCOUNT_DISPLAY.name}
-                    </Text>
-                    <Text style={[styles.suggestionEmail, { textAlign: isRTL ? 'right' : 'left' }]}>
-                      {BUILT_IN_ACCOUNT_DISPLAY.email} · {t.savedAccount}
-                    </Text>
-                  </View>
-                </PressableScale>
-              )}
-            </View>
+            {showSavedAccount && (
+              <PressableScale onPress={handleQuickSignIn} disabled={busy} style={styles.suggestion}>
+                <Text style={styles.suggestionIcon}>👤</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.suggestionName, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    {BUILT_IN_ACCOUNT_DISPLAY.name}
+                  </Text>
+                  <Text style={[styles.suggestionEmail, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    {BUILT_IN_ACCOUNT_DISPLAY.email} · {t.savedAccount}
+                  </Text>
+                </View>
+              </PressableScale>
+            )}
+
+            <TextInput
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              value={email}
+              onChangeText={setEmail}
+              placeholder={t.email}
+              placeholderTextColor={C.soft}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
             <TextInput
               style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
               value={password}
               onChangeText={setPassword}
-              onFocus={() => setEmailFocused(false)}
               placeholder={t.password}
               placeholderTextColor={C.soft}
               secureTextEntry
@@ -149,12 +145,9 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontFamily: 'Heebo_800ExtraBold', color: C.text },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
   suggestion: {
-    position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 6, zIndex: 10,
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: 'white', borderRadius: 14, borderWidth: 1.5, borderColor: C.purple + '40',
+    backgroundColor: C.purpleL, borderRadius: 14, borderWidth: 1.5, borderColor: C.purple + '40',
     padding: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1, shadowRadius: 10, elevation: 6,
   },
   suggestionIcon: {
     fontSize: 20, backgroundColor: C.purpleL, borderRadius: 10,
