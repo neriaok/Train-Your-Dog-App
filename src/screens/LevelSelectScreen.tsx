@@ -39,7 +39,7 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
           {user ? (
             <PressableScale onPress={signOut} style={styles.accountBtn}>
               <Text style={styles.accountBtnText} numberOfLines={1}>
-                {isPremium ? '👑 ' : ''}{user.email} · {t.signOut}
+                {isPremium ? '👑 ' : ''}{user.name ?? user.email} · {t.signOut}
               </Text>
             </PressableScale>
           ) : (

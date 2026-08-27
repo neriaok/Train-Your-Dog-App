@@ -9,20 +9,31 @@ import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { C } from '../data';
+import { BUILT_IN_ACCOUNT_DISPLAY } from '../auth/mockAuth';
 
 interface Props { onBack: () => void; onAuthed: () => void; }
 
 export default function AuthScreen({ onBack, onAuthed }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).auth;
-  const { isMock, signIn, signUp } = useAuth();
+  const { isMock, signIn, signUp, quickSignIn } = useAuth();
 
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailFocused, setEmailFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const showSavedAccount = isMock && mode === 'signIn' && emailFocused && email.trim() === '';
+
+  const handleQuickSignIn = async () => {
+    setBusy(true);
+    await quickSignIn();
+    setBusy(false);
+    onAuthed();
+  };
 
   const submit = async () => {
     setError(null);
@@ -72,19 +83,36 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
               </PressableScale>
             </View>
 
-            <TextInput
-              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
-              value={email}
-              onChangeText={setEmail}
-              placeholder={t.email}
-              placeholderTextColor={C.soft}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
+            <View>
+              <TextInput
+                style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setEmailFocused(true)}
+                placeholder={t.email}
+                placeholderTextColor={C.soft}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+              {showSavedAccount && (
+                <PressableScale onPress={handleQuickSignIn} disabled={busy} style={styles.suggestion}>
+                  <Text style={styles.suggestionIcon}>👤</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.suggestionName, { textAlign: isRTL ? 'right' : 'left' }]}>
+                      {BUILT_IN_ACCOUNT_DISPLAY.name}
+                    </Text>
+                    <Text style={[styles.suggestionEmail, { textAlign: isRTL ? 'right' : 'left' }]}>
+                      {BUILT_IN_ACCOUNT_DISPLAY.email} · {t.savedAccount}
+                    </Text>
+                  </View>
+                </PressableScale>
+              )}
+            </View>
             <TextInput
               style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
               value={password}
               onChangeText={setPassword}
+              onFocus={() => setEmailFocused(false)}
               placeholder={t.password}
               placeholderTextColor={C.soft}
               secureTextEntry
@@ -120,6 +148,20 @@ const styles = StyleSheet.create({
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
   title: { fontSize: 18, fontFamily: 'Heebo_800ExtraBold', color: C.text },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
+  suggestion: {
+    position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 6, zIndex: 10,
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: 'white', borderRadius: 14, borderWidth: 1.5, borderColor: C.purple + '40',
+    padding: 12,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1, shadowRadius: 10, elevation: 6,
+  },
+  suggestionIcon: {
+    fontSize: 20, backgroundColor: C.purpleL, borderRadius: 10,
+    width: 34, height: 34, textAlign: 'center', textAlignVertical: 'center', overflow: 'hidden',
+  },
+  suggestionName: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
+  suggestionEmail: { fontSize: 11, fontFamily: 'Heebo_400Regular', color: C.soft },
   card: {
     backgroundColor: C.white, borderRadius: 28, padding: 24,
     borderWidth: 1, borderColor: C.border, gap: 12,

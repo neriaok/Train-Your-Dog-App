@@ -20,8 +20,21 @@ export const MOCK_USER_ID = 'mock-user';
 interface MockAccount {
   email: string;
   password: string;
+  name?: string;
   isPremium: boolean;
 }
+
+// One-tap demo login - already on the paid plan, so the whole app (every
+// level, no paywall) is reachable in a single click with no typing.
+const BUILT_IN_ACCOUNT: MockAccount = {
+  email: 'neriaok@demo.app',
+  password: 'demo',
+  name: 'Neriaok',
+  isPremium: true,
+};
+
+// Exposed for the sign-in screen's "saved account" suggestion UI.
+export const BUILT_IN_ACCOUNT_DISPLAY = { name: BUILT_IN_ACCOUNT.name!, email: BUILT_IN_ACCOUNT.email };
 
 async function readAccount(): Promise<MockAccount | null> {
   const raw = await AsyncStorage.getItem(ACCOUNT_KEY);
@@ -57,6 +70,12 @@ export async function mockSignIn(email: string, password: string): Promise<{ err
   }
   await AsyncStorage.setItem(SESSION_KEY, '1');
   return { error: null };
+}
+
+/** One-tap sign-in as the built-in demo account (already premium). */
+export async function mockQuickSignIn(): Promise<void> {
+  await writeAccount(BUILT_IN_ACCOUNT);
+  await AsyncStorage.setItem(SESSION_KEY, '1');
 }
 
 export async function mockSignOut(): Promise<void> {

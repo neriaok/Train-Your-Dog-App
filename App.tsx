@@ -103,7 +103,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
     <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
       <StatusBar style="dark" />
       <Animated.View style={{ flex: 1, opacity: screenFade }}>
-        {screen === 'splash' && <SplashScreenComp onStart={handleStart} />}
+        {screen === 'splash' && <SplashScreenComp onStart={handleStart} onOpenAuth={handleOpenAuth} />}
         {screen === 'levels' && (
           <LevelSelectScreen
             levels={LEVELS} completed={completed}

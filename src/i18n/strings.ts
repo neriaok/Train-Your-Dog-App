@@ -37,6 +37,7 @@ export const STRINGS = {
       switchToSignIn: 'כבר יש לך חשבון? התחברות',
       signUpSuccess: 'נרשמת בהצלחה! בדוק/י את המייל לאימות, ואז התחבר/י.',
       back: 'חזרה',
+      savedAccount: 'חשבון שמור',
     },
     upgrade: {
       title: 'שדרוג לפרימיום',
@@ -124,6 +125,7 @@ export const STRINGS = {
       switchToSignIn: 'Already have an account? Sign in',
       signUpSuccess: 'Signed up! Check your email to verify, then sign in.',
       back: 'Back',
+      savedAccount: 'Saved account',
     },
     upgrade: {
       title: 'Upgrade to Premium',

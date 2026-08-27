@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
-import { mockLoadState, mockSignUp, mockSignIn, mockSignOut, mockSetPremium, MOCK_USER_ID } from './mockAuth';
+import { mockLoadState, mockSignUp, mockSignIn, mockQuickSignIn, mockSignOut, mockSetPremium, MOCK_USER_ID } from './mockAuth';
 
 export interface AppUser {
   id: string;
   email: string | null;
+  name?: string;
 }
 
 interface AuthContextValue {
@@ -16,6 +17,8 @@ interface AuthContextValue {
   isPremium: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  /** Mock mode only - one tap sign-in as the built-in "Neriaok" demo account, already premium. */
+  quickSignIn: () => Promise<void>;
   signOut: () => Promise<void>;
   /** Mock mode only - simulates a successful purchase, no real charge. */
   upgradeToPremium: () => Promise<void>;
@@ -30,6 +33,7 @@ const AuthContext = createContext<AuthContextValue>({
   isPremium: false,
   signUp: async () => ({ error: null }),
   signIn: async () => ({ error: null }),
+  quickSignIn: async () => {},
   signOut: async () => {},
   upgradeToPremium: async () => {},
   downgradeFromPremium: async () => {},
@@ -46,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mock state
   const [mockSignedIn, setMockSignedIn] = useState(false);
   const [mockEmail, setMockEmail] = useState<string | null>(null);
+  const [mockName, setMockName] = useState<string | undefined>(undefined);
   const [mockPremium, setMockPremium] = useState(false);
 
   const loadProfile = async (userId: string) => {
@@ -58,12 +63,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data) setProfile(data as { is_premium: boolean });
   };
 
+  const applyMockAccount = (account: { email: string; name?: string; isPremium: boolean } | null) => {
+    setMockEmail(account?.email ?? null);
+    setMockName(account?.name);
+    setMockPremium(account?.isPremium ?? false);
+  };
+
   useEffect(() => {
     if (isMock) {
       mockLoadState().then(({ signedIn, account }) => {
         setMockSignedIn(signedIn);
-        setMockEmail(account?.email ?? null);
-        setMockPremium(account?.isPremium ?? false);
+        applyMockAccount(account);
         setReady(true);
       });
       return;
@@ -96,8 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await mockSignUp(email, password);
       if (!result.error) {
         setMockSignedIn(true);
-        setMockEmail(email);
-        setMockPremium(false);
+        applyMockAccount({ email, isPremium: false });
       }
       return result;
     }
@@ -111,15 +120,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await mockSignIn(email, password);
       if (!result.error) {
         setMockSignedIn(true);
-        setMockEmail(email);
         const { account } = await mockLoadState();
-        setMockPremium(account?.isPremium ?? false);
+        applyMockAccount(account);
       }
       return result;
     }
     if (!supabase) return { error: 'Accounts are not enabled yet' };
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
+  };
+
+  const quickSignIn = async () => {
+    if (!isMock) return;
+    await mockQuickSignIn();
+    setMockSignedIn(true);
+    const { account } = await mockLoadState();
+    applyMockAccount(account);
   };
 
   const signOut = async () => {
@@ -145,14 +161,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const user: AppUser | null = isMock
-    ? (mockSignedIn ? { id: MOCK_USER_ID, email: mockEmail } : null)
+    ? (mockSignedIn ? { id: MOCK_USER_ID, email: mockEmail, name: mockName } : null)
     : (session ? { id: session.user.id, email: session.user.email ?? null } : null);
 
   const isPremium = isMock ? mockPremium : (profile?.is_premium ?? false);
 
   return (
     <AuthContext.Provider
-      value={{ ready, isMock, user, isPremium, signUp, signIn, signOut, upgradeToPremium, downgradeFromPremium }}
+      value={{ ready, isMock, user, isPremium, signUp, signIn, quickSignIn, signOut, upgradeToPremium, downgradeFromPremium }}
     >
       {children}
     </AuthContext.Provider>
