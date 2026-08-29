@@ -19,17 +19,23 @@ export const styles = StyleSheet.create({
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
   title: { fontSize: 18, fontFamily: 'Heebo_800ExtraBold', color: C.text },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  suggestion: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: C.purpleL, borderRadius: 14, borderWidth: 1.5, borderColor: C.purple + '40',
-    padding: 12,
+  // Small, plain dropdown for the dev-only saved-account shortcut - kept
+  // deliberately unstyled/quiet (not a branded card) since it's a
+  // development convenience, not a real product feature.
+  fieldWrap: { position: 'relative', zIndex: 20 },
+  suggestionDropdown: {
+    position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 3,
+    backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: C.border,
+    overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, shadowRadius: 6, elevation: 4,
   },
-  suggestionIcon: {
-    fontSize: 20, backgroundColor: C.purpleL, borderRadius: 10,
-    width: 34, height: 34, textAlign: 'center', textAlignVertical: 'center', overflow: 'hidden',
+  suggestionRow: {
+    flexDirection: 'row', alignItems: 'baseline', gap: 6,
+    paddingVertical: 8, paddingHorizontal: 10,
   },
-  suggestionName: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
-  suggestionEmail: { fontSize: 11, fontFamily: 'Heebo_400Regular', color: C.soft },
+  suggestionName: { fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.text },
+  suggestionEmail: { fontSize: 10, fontFamily: 'Heebo_400Regular', color: C.soft },
   card: {
     backgroundColor: C.white, borderRadius: 28, padding: 24,
     borderWidth: 1, borderColor: C.border, gap: 12,

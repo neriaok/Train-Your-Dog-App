@@ -17,9 +17,12 @@ export function useAuthForm(onAuthed: () => void) {
   const [mode, setMode] = useState<AuthMode>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailFocused, setEmailFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<AuthNotice>(null);
   const [busy, setBusy] = useState(false);
+
+  const showSavedAccount = isMock && mode === 'signIn' && emailFocused && email.trim() === '';
 
   const handleQuickSignIn = async () => {
     setBusy(true);
@@ -51,6 +54,7 @@ export function useAuthForm(onAuthed: () => void) {
 
   return {
     isMock, mode, setMode, email, setEmail, password, setPassword,
+    emailFocused, setEmailFocused, showSavedAccount,
     error, notice, busy, submit, handleQuickSignIn,
   };
 }

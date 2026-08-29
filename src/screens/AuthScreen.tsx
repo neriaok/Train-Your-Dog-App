@@ -26,11 +26,10 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).auth;
   const {
-    isMock, mode, setMode, email, setEmail, password, setPassword,
+    mode, setMode, email, setEmail, password, setPassword,
+    setEmailFocused, showSavedAccount,
     error, notice, busy, submit, handleQuickSignIn,
   } = useAuthForm(onAuthed);
-
-  const showSavedAccount = isMock && mode === 'signIn' && email.trim() === '';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -59,35 +58,33 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
               </PressableScale>
             </View>
 
-            {showSavedAccount && (
-              <PressableScale onPress={handleQuickSignIn} disabled={busy} style={styles.suggestion}>
-                <Text style={styles.suggestionIcon}>👤</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.suggestionName, { textAlign: isRTL ? 'right' : 'left' }]}>
-                    {BUILT_IN_ACCOUNT_DISPLAY.name}
-                  </Text>
-                  <Text style={[styles.suggestionEmail, { textAlign: isRTL ? 'right' : 'left' }]}>
-                    {BUILT_IN_ACCOUNT_DISPLAY.email} · {t.savedAccount}
-                  </Text>
+            <View style={styles.fieldWrap}>
+              <TextInput
+                style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setEmailFocused(true)}
+                placeholder={t.email}
+                placeholderTextColor={C.soft}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="username"
+                autoComplete="email"
+              />
+              {showSavedAccount && (
+                <View style={styles.suggestionDropdown}>
+                  <PressableScale onPress={handleQuickSignIn} disabled={busy} style={styles.suggestionRow}>
+                    <Text style={styles.suggestionName}>👤 {BUILT_IN_ACCOUNT_DISPLAY.name}</Text>
+                    <Text style={styles.suggestionEmail}>{BUILT_IN_ACCOUNT_DISPLAY.email}</Text>
+                  </PressableScale>
                 </View>
-              </PressableScale>
-            )}
-
-            <TextInput
-              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
-              value={email}
-              onChangeText={setEmail}
-              placeholder={t.email}
-              placeholderTextColor={C.soft}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="username"
-              autoComplete="email"
-            />
+              )}
+            </View>
             <TextInput
               style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
               value={password}
               onChangeText={setPassword}
+              onFocus={() => setEmailFocused(false)}
               placeholder={t.password}
               placeholderTextColor={C.soft}
               secureTextEntry
