@@ -1,12 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, TextInput, ScrollView,
+  View, Text, TextInput, ScrollView, Animated,
   KeyboardAvoidingView, Platform, StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableScale from '../components/PressableScale';
 import { runAgent } from '../agent/runAgent';
-import { AgentStep, AgentMessage } from '../agent/types';
+import { AgentMessage } from '../agent/types';
 import { Level, C } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
@@ -15,14 +15,18 @@ interface Props { levels: Level[]; onBack: () => void; }
 
 type ChatEntry =
   | { id: string; kind: 'user'; text: string }
-  | { id: string; kind: 'step'; step: AgentStep };
+  | { id: string; kind: 'agent'; text: string }
+  | { id: string; kind: 'typing' };
 
+// User-facing chat only ever shows their own messages and the assistant's
+// final replies - runAgent's intermediate "thinking"/"tool_call"/"tool_result"
+// steps are internal implementation detail, not something to surface here.
 export default function AgentChatScreen({ levels, onBack }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).agent;
   const [input, setInput] = useState('');
   const [entries, setEntries] = useState<ChatEntry[]>([
-    { id: 'intro', kind: 'step', step: { type: 'final', text: t.intro } },
+    { id: 'intro', kind: 'agent', text: t.intro },
   ]);
   const historyRef = useRef<AgentMessage[]>([]);
   const scrollRef = useRef<ScrollView>(null);
@@ -31,17 +35,21 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
     const text = input.trim();
     if (!text) return;
     setInput('');
-    setEntries(prev => [...prev, { id: `u-${Date.now()}`, kind: 'user', text }]);
+    const typingId = `typing-${Date.now()}`;
+    setEntries(prev => [...prev, { id: `u-${Date.now()}`, kind: 'user', text }, { id: typingId, kind: 'typing' }]);
+    requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
 
     const steps = await runAgent(text, levels, language, historyRef.current);
-    steps.forEach((step, i) => {
-      setTimeout(() => {
-        setEntries(prev => [...prev, { id: `a-${Date.now()}-${i}`, kind: 'step', step }]);
-        requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
-      }, (i + 1) * 550);
-    });
-
     const finalStep = steps.find(s => s.type === 'final');
+
+    setTimeout(() => {
+      setEntries(prev => [
+        ...prev.filter(e => e.id !== typingId),
+        { id: `a-${Date.now()}`, kind: 'agent', text: finalStep?.text ?? '' },
+      ]);
+      requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
+    }, 700);
+
     historyRef.current = [
       ...historyRef.current,
       { role: 'user', content: text },
@@ -67,17 +75,27 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
         >
-          {entries.map(e =>
-            e.kind === 'user' ? (
-              <View key={e.id} style={styles.userRow}>
-                <View style={styles.userBubble}>
-                  <Text style={styles.userText}>{e.text}</Text>
+          {entries.map(e => {
+            if (e.kind === 'user') {
+              return (
+                <View key={e.id} style={styles.userRow}>
+                  <View style={styles.userBubble}>
+                    <Text style={styles.userText}>{e.text}</Text>
+                  </View>
+                </View>
+              );
+            }
+            if (e.kind === 'typing') {
+              return <TypingBubble key={e.id} />;
+            }
+            return (
+              <View key={e.id} style={styles.agentRow}>
+                <View style={styles.agentBubble}>
+                  <Text style={styles.agentText}>{e.text}</Text>
                 </View>
               </View>
-            ) : (
-              <AgentStepBubble key={e.id} step={e.step} t={t} />
-            )
-          )}
+            );
+          })}
         </ScrollView>
 
         <View style={styles.inputRow}>
@@ -99,35 +117,33 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
   );
 }
 
-function AgentStepBubble({ step, t }: { step: AgentStep; t: ReturnType<typeof useStrings>['agent'] }) {
-  if (step.type === 'thinking') {
-    return (
-      <View style={styles.systemRow}>
-        <Text style={styles.thinkingText}>🤔 {step.text}</Text>
-      </View>
+function TypingBubble() {
+  const dots = [useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current];
+
+  useEffect(() => {
+    const anims = dots.map((d, i) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(i * 150),
+          Animated.timing(d, { toValue: 1, duration: 350, useNativeDriver: true }),
+          Animated.timing(d, { toValue: 0, duration: 350, useNativeDriver: true }),
+          Animated.delay((2 - i) * 150),
+        ])
+      )
     );
-  }
-  if (step.type === 'tool_call') {
-    return (
-      <View style={styles.systemRow}>
-        <Text style={styles.toolText}>
-          {'🔧 ' + t.runningTool + ' '}
-          <Text style={styles.toolCode}>{step.tool}({JSON.stringify(step.args)})</Text>
-        </Text>
-      </View>
-    );
-  }
-  if (step.type === 'tool_result') {
-    return (
-      <View style={styles.systemRow}>
-        <Text style={styles.toolText}>📦 {t.toolResult}</Text>
-      </View>
-    );
-  }
+    anims.forEach(a => a.start());
+    return () => anims.forEach(a => a.stop());
+  }, []);
+
   return (
     <View style={styles.agentRow}>
-      <View style={styles.agentBubble}>
-        <Text style={styles.agentText}>{step.text}</Text>
+      <View style={[styles.agentBubble, styles.typingBubble]}>
+        {dots.map((d, i) => (
+          <Animated.View
+            key={i}
+            style={[styles.typingDot, { opacity: d.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }]}
+          />
+        ))}
       </View>
     </View>
   );
@@ -152,12 +168,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 10, maxWidth: '80%',
   },
   userText: { color: 'white', fontSize: 14, fontFamily: 'Heebo_600SemiBold' },
-  systemRow: { alignItems: 'flex-start' },
-  thinkingText: {
-    fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.soft, fontStyle: 'italic',
-  },
-  toolText: { fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.teal },
-  toolCode: { fontFamily: 'Heebo_600SemiBold', color: C.teal },
   agentRow: { alignItems: 'flex-start' },
   agentBubble: {
     backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
@@ -165,6 +175,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 10, maxWidth: '85%',
   },
   agentText: { color: C.text, fontSize: 14, fontFamily: 'Heebo_400Regular', lineHeight: 21 },
+  typingBubble: { flexDirection: 'row', gap: 4, paddingVertical: 14 },
+  typingDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.soft },
   inputRow: {
     flexDirection: 'row', gap: 8, padding: 16, paddingTop: 8,
     borderTopWidth: 1, borderTopColor: C.border, backgroundColor: C.bg,

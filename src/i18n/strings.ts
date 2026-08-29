@@ -80,9 +80,6 @@ export const STRINGS = {
       intro: 'שלום! אני עוזר האילוף. שאל אותי על פקודה, על רמה, או בקש "טיפ"!',
       placeholder: 'שאל למשל: "מה זה שב?" או "מה יש ברמה 2"',
       send: 'שלח',
-      thinking: 'מנתח את ההודעה ומחפש כלי מתאים...',
-      runningTool: 'מפעיל כלי:',
-      toolResult: 'תוצאת הכלי התקבלה',
       fallback: 'לא הצלחתי למצוא תשובה לשאלה הזו 🤔 נסה לשאול על פקודה ספציפית (למשל "שב"), על רמה ("מה יש ברמה 2"), לבקש "טיפ", או לשאול "אילו פקודות יש".',
     },
     languagePicker: {
@@ -168,9 +165,6 @@ export const STRINGS = {
       intro: 'Hi! I\'m the training assistant. Ask me about a command, a level, or ask for a "tip"!',
       placeholder: 'Try: "What is sit?" or "What\'s in level 2?"',
       send: 'Send',
-      thinking: 'Analyzing the message and looking for a matching tool...',
-      runningTool: 'Running tool:',
-      toolResult: 'Tool result received',
       fallback: 'I couldn\'t find an answer to that 🤔 Try asking about a specific command (e.g. "sit"), a level ("what\'s in level 2?"), ask for a "tip", or ask "what commands are there".',
     },
     languagePicker: {
