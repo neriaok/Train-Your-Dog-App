@@ -87,18 +87,20 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
               <Text style={styles.accountBtnText}>{t.signIn}</Text>
             </PressableScale>
           )}
-          <PressableScale onPress={onOpenProfile} style={styles.accountBtn}>
-            {profile?.name ? (
-              <Text style={styles.accountBtnText} numberOfLines={1}>🐾 {profile.name}</Text>
-            ) : (
-              <Text style={styles.accountBtnText}>➕ {t.addDog}</Text>
-            )}
-          </PressableScale>
+          {user && (
+            <PressableScale onPress={onOpenProfile} style={styles.accountBtn}>
+              {profile?.name ? (
+                <Text style={styles.accountBtnText} numberOfLines={1}>🐾 {profile.name}</Text>
+              ) : (
+                <Text style={styles.accountBtnText}>➕ {t.addDog}</Text>
+              )}
+            </PressableScale>
+          )}
           <LanguagePicker />
         </View>
 
         <Animated.View style={{ opacity: fade, transform: [{ translateY: slide }] }}>
-          {profile?.photoUri ? (
+          {user && profile?.photoUri ? (
             <Image source={{ uri: profile.photoUri }} style={styles.heroPhoto} />
           ) : (
             <Text style={styles.dog}>🐕</Text>
