@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
+import { View, Text, Image, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProgressBar from '../components/ProgressBar';
 import PressableScale from '../components/PressableScale';
@@ -8,20 +8,25 @@ import { Level, C } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useAuth } from '../auth/AuthContext';
+import { useDogProfile } from '../profile/DogProfileContext';
+import { StreakState } from '../progress/streak';
 
 interface Props {
   levels: Level[];
   completed: number[];
+  streak: StreakState;
   onSelect: (id: number) => void;
   onOpenAgent: () => void;
   onOpenAuth: () => void;
   onOpenUpgrade: () => void;
+  onOpenProfile: () => void;
 }
 
-export default function LevelSelectScreen({ levels, completed, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade }: Props) {
+export default function LevelSelectScreen({ levels, completed, streak, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade, onOpenProfile }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).levels;
   const { user, isPremium, signOut } = useAuth();
+  const { profile } = useDogProfile();
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
   const [showTeaser, setShowTeaser] = useState(false);
@@ -54,6 +59,19 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
 
   const openAgent = () => { dismissTeaser(); onOpenAgent(); };
 
+  const badges: { key: string; emoji: string; label: string; color: string }[] = [];
+  levels.forEach(lvl => {
+    if (completed.includes(lvl.id)) {
+      badges.push({ key: `lvl-${lvl.id}`, emoji: lvl.emoji, label: lvl.title, color: lvl.color });
+    }
+  });
+  if (streak.streak >= 3) {
+    badges.push({ key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orange });
+  }
+  if (levels.length > 0 && completed.length === levels.length) {
+    badges.push({ key: 'alldone', emoji: '🏆', label: t.badgeAllDone, color: C.purple });
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -69,18 +87,56 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
               <Text style={styles.accountBtnText}>{t.signIn}</Text>
             </PressableScale>
           )}
+          <PressableScale onPress={onOpenProfile} style={styles.accountBtn}>
+            {profile?.name ? (
+              <Text style={styles.accountBtnText} numberOfLines={1}>🐾 {profile.name}</Text>
+            ) : (
+              <Text style={styles.accountBtnText}>➕ {t.addDog}</Text>
+            )}
+          </PressableScale>
           <LanguagePicker />
         </View>
 
         <Animated.View style={{ opacity: fade, transform: [{ translateY: slide }] }}>
-          <Text style={styles.dog}>🐕</Text>
+          {profile?.photoUri ? (
+            <Image source={{ uri: profile.photoUri }} style={styles.heroPhoto} />
+          ) : (
+            <Text style={styles.dog}>🐕</Text>
+          )}
           <Text style={styles.title}>{t.heading}</Text>
           <Text style={styles.sub}>{t.progress(completed.length, levels.length)}</Text>
         </Animated.View>
 
         <View style={styles.progressCard}>
           <ProgressBar value={completed.length} total={levels.length} color={C.orange} />
+          {streak.streak > 0 && (
+            <View style={[styles.streakRow, { justifyContent: isRTL ? 'flex-end' : 'flex-start' }]}>
+              <Text style={styles.streakText}>🔥 {t.streakLabel(streak.streak)}</Text>
+            </View>
+          )}
         </View>
+
+        {streak.streak > 0 && !streak.practicedToday && (
+          <View style={styles.reminderBanner}>
+            <Text style={styles.reminderText}>{t.streakReminder}</Text>
+          </View>
+        )}
+
+        {badges.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.badgesRow}
+            contentContainerStyle={styles.badgesRowContent}
+          >
+            {badges.map(b => (
+              <View key={b.key} style={[styles.badgeChip, { borderColor: b.color + '50', backgroundColor: b.color + '15' }]}>
+                <Text style={styles.badgeEmoji}>{b.emoji}</Text>
+                <Text style={[styles.badgeLabel, { color: b.color }]} numberOfLines={1}>{b.label}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        )}
 
         {levels.map((lvl, i) => {
           const locked = i > 0 && !completed.includes(levels[i - 1].id);
@@ -175,6 +231,10 @@ const styles = StyleSheet.create({
   },
   accountBtnText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.text },
   dog: { fontSize: 44, textAlign: 'center', marginBottom: 8 },
+  heroPhoto: {
+    width: 64, height: 64, borderRadius: 32, alignSelf: 'center', marginBottom: 8,
+    borderWidth: 2, borderColor: C.white,
+  },
   title: {
     fontSize: 26, fontFamily: 'Heebo_800ExtraBold',
     color: C.text, textAlign: 'center', marginBottom: 6,
@@ -189,6 +249,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06,
     shadowRadius: 8, elevation: 3, borderWidth: 1, borderColor: C.border,
   },
+  streakRow: { flexDirection: 'row', marginTop: 10 },
+  streakText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.orange },
+  reminderBanner: {
+    backgroundColor: C.orangeL, borderWidth: 1.5, borderColor: C.orange + '40',
+    borderRadius: 14, padding: 12, marginBottom: 16,
+  },
+  reminderText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange, textAlign: 'center' },
+  badgesRow: { marginBottom: 16 },
+  badgesRowContent: { gap: 8, paddingRight: 2 },
+  badgeChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8,
+    maxWidth: 160,
+  },
+  badgeEmoji: { fontSize: 15 },
+  badgeLabel: { fontSize: 12, fontFamily: 'Heebo_700Bold' },
   card: {
     backgroundColor: C.white, borderRadius: 24, padding: 20,
     marginBottom: 16, shadowColor: '#000',

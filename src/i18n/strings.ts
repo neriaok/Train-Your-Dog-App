@@ -24,6 +24,12 @@ export const STRINGS = {
       signOut: 'התנתקות',
       premiumBadge: 'פרימיום',
       lockedPremium: '🔒 פרימיום',
+      streakLabel: (n: number) => `${n} ימים ברצף`,
+      streakReminder: 'עוד לא תרגלתם היום - שמרו על הרצף! 🔥',
+      badgesTitle: 'ההישגים שלכם',
+      badgeAllDone: 'כל הרמות!',
+      streakBadge: (n: number) => `${n} ימים ברצף!`,
+      addDog: 'הוסיפו את הכלב שלכם',
     },
     auth: {
       title: 'החשבון שלי',
@@ -85,6 +91,17 @@ export const STRINGS = {
     languagePicker: {
       title: 'בחרו שפה',
     },
+    profile: {
+      title: 'פרופיל הכלב',
+      back: 'חזרה',
+      namePlaceholder: 'שם הכלב',
+      breedPlaceholder: 'גזע (לא חובה)',
+      photoHint: 'הוסיפו תמונה',
+      changePhoto: 'החליפו תמונה',
+      since: (date: string) => `מתאמנים יחד מ-${date}`,
+      saveBtn: 'שמירה',
+      nameRequired: 'צריך למלא שם כדי לשמור',
+    },
   },
   en: {
     splash: {
@@ -109,6 +126,12 @@ export const STRINGS = {
       signOut: 'Sign out',
       premiumBadge: 'Premium',
       lockedPremium: '🔒 Premium',
+      streakLabel: (n: number) => `${n} day streak`,
+      streakReminder: "You haven't practiced today - keep your streak! 🔥",
+      badgesTitle: 'Your Achievements',
+      badgeAllDone: 'All levels!',
+      streakBadge: (n: number) => `${n} day streak!`,
+      addDog: 'Add your dog',
     },
     auth: {
       title: 'My Account',
@@ -169,6 +192,17 @@ export const STRINGS = {
     },
     languagePicker: {
       title: 'Choose Language',
+    },
+    profile: {
+      title: 'Dog Profile',
+      back: 'Back',
+      namePlaceholder: "Dog's name",
+      breedPlaceholder: 'Breed (optional)',
+      photoHint: 'Add a photo',
+      changePhoto: 'Change photo',
+      since: (date: string) => `Training together since ${date}`,
+      saveBtn: 'Save',
+      nameRequired: 'Enter a name to save',
     },
   },
 } as const;
