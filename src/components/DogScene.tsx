@@ -12,6 +12,7 @@ const collarColors: Record<IllustrationKey, string> = {
   crate_enter: '#2EC4B6', crate_return: '#2EC4B6', crate_full: '#2EC4B6',
   leave_close: '#9B5DE5', leave_back: '#9B5DE5', leave_walk: '#9B5DE5',
   walk_pull: '#06D6A0', walk_sit: '#06D6A0', walk_stay: '#06D6A0',
+  trick_paw: '#E8A317', trick_high5: '#E8A317', trick_spin: '#E8A317',
 };
 
 const bubbleTexts: Record<Language, Record<IllustrationKey, string>> = {
@@ -20,12 +21,14 @@ const bubbleTexts: Record<Language, Record<IllustrationKey, string>> = {
     crate_enter: 'מקום!', crate_return: 'אליי! מקום!', crate_full: 'מקום!',
     leave_close: 'עזוב!', leave_back: 'עזוב!', leave_walk: 'עזוב!',
     walk_pull: 'לידי!', walk_sit: 'שב!', walk_stay: 'הישאר!',
+    trick_paw: 'תן כף!', trick_high5: 'גבוה!', trick_spin: 'הסתובב!',
   },
   en: {
     sit: 'Sit!', come: 'Come!', down: 'Down!',
     crate_enter: 'Place!', crate_return: 'Come! Place!', crate_full: 'Place!',
     leave_close: 'Leave it!', leave_back: 'Leave it!', leave_walk: 'Leave it!',
     walk_pull: 'Heel!', walk_sit: 'Sit!', walk_stay: 'Stay!',
+    trick_paw: 'Paw!', trick_high5: 'High five!', trick_spin: 'Spin!',
   },
 };
 
@@ -425,6 +428,117 @@ function DogWalkStay({ col, wag, language }: { col: string; wag: number; languag
   );
 }
 
+function DogTrickPaw({ col, wag }: { col: string; wag: number }) {
+  return (
+    <G>
+      <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
+      <Ellipse cx="88" cy="182" rx="23" ry="19" fill="#D4A055" />
+      <Ellipse cx="113" cy="182" rx="19" ry="17" fill="#C89040" />
+      <Rect x="93" y="162" width="12" height="34" rx="6" fill="#C89040" />
+      <Ellipse cx="99" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="98" cy="156" rx="27" ry="21" fill="#D4A055" />
+      <Ellipse cx="98" cy="136" rx="16" ry="12" fill="#D4A055" />
+      <Rect x="83" y="142" width="29" height="7" rx="3" fill={col} />
+      <Circle cx="98" cy="146" r="3" fill="#FFD166" />
+      <Ellipse cx="98" cy="115" rx="23" ry="21" fill="#D4A055" />
+      <Ellipse cx="91" cy="111" rx="12" ry="9" fill="#EEC070" opacity="0.5" />
+      <Ellipse cx="78" cy="121" rx="9" ry="16" fill="#C08030" rotation="-14" originX="78" originY="121" />
+      <Ellipse cx="118" cy="121" rx="9" ry="16" fill="#C08030" rotation="14" originX="118" originY="121" />
+      <Ellipse cx="98" cy="128" rx="12" ry="9" fill="#C89040" />
+      <Ellipse cx="98" cy="124" rx="9" ry="6" fill="#DCAA5A" />
+      <Ellipse cx="98" cy="120" rx="6" ry="4" fill="#2C1810" />
+      <Circle cx="88" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="109" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="86.5" cy="110.5" r="1.8" fill="white" />
+      <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
+      <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
+      {/* Raised paw, offered toward the human */}
+      <Rect x="100" y="168" width="11" height="26" rx="5" fill="#D4A055" rotation="-55" originX="100" originY="180" />
+      <Ellipse cx="123" cy="163" rx="8" ry="5" fill="#B87830" rotation="-30" originX="123" originY="163" />
+      <G rotation={wag} originX="122" originY="160">
+        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
+    </G>
+  );
+}
+
+function DogTrickHigh5({ col, wag }: { col: string; wag: number }) {
+  return (
+    <G>
+      <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
+      <Ellipse cx="88" cy="182" rx="23" ry="19" fill="#D4A055" />
+      <Ellipse cx="113" cy="182" rx="19" ry="17" fill="#C89040" />
+      <Rect x="93" y="162" width="12" height="34" rx="6" fill="#C89040" />
+      <Ellipse cx="99" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="98" cy="156" rx="27" ry="21" fill="#D4A055" />
+      <Ellipse cx="98" cy="136" rx="16" ry="12" fill="#D4A055" />
+      <Rect x="83" y="142" width="29" height="7" rx="3" fill={col} />
+      <Circle cx="98" cy="146" r="3" fill="#FFD166" />
+      <Ellipse cx="98" cy="115" rx="23" ry="21" fill="#D4A055" />
+      <Ellipse cx="91" cy="111" rx="12" ry="9" fill="#EEC070" opacity="0.5" />
+      <Ellipse cx="78" cy="121" rx="9" ry="16" fill="#C08030" rotation="-14" originX="78" originY="121" />
+      <Ellipse cx="118" cy="121" rx="9" ry="16" fill="#C08030" rotation="14" originX="118" originY="121" />
+      <Ellipse cx="98" cy="128" rx="12" ry="9" fill="#C89040" />
+      <Ellipse cx="98" cy="124" rx="9" ry="6" fill="#DCAA5A" />
+      <Ellipse cx="98" cy="120" rx="6" ry="4" fill="#2C1810" />
+      <Circle cx="88" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="109" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="86.5" cy="110.5" r="1.8" fill="white" />
+      <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
+      <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
+      {/* Paw raised high to meet the human's hand */}
+      <Rect x="103" y="128" width="11" height="34" rx="5" fill="#D4A055" rotation="-72" originX="103" originY="160" />
+      <Ellipse cx="132" cy="120" rx="8" ry="5" fill="#B87830" rotation="-15" originX="132" originY="120" />
+      <SvgText x="140" y="112" fontSize="14" textAnchor="middle">&#10024;</SvgText>
+      <G rotation={wag} originX="122" originY="160">
+        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
+    </G>
+  );
+}
+
+function DogTrickSpin({ col, wag }: { col: string; wag: number }) {
+  return (
+    <G>
+      {/* Motion swirl around the dog */}
+      <Path d="M56 152 A48 44 0 1 1 142 152" stroke={col} strokeWidth="2.5" strokeDasharray="5 4" fill="none" opacity="0.5" />
+      <Polygon points="136,146 147,150 139,159" fill={col} opacity="0.7" />
+      <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
+      <Ellipse cx="88" cy="182" rx="23" ry="19" fill="#D4A055" />
+      <Ellipse cx="113" cy="182" rx="19" ry="17" fill="#C89040" />
+      <Rect x="77" y="162" width="12" height="34" rx="6" fill="#D4A055" />
+      <Rect x="93" y="162" width="12" height="34" rx="6" fill="#C89040" />
+      <Ellipse cx="83" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="99" cy="197" rx="8" ry="4" fill="#B87830" />
+      <Ellipse cx="98" cy="156" rx="27" ry="21" fill="#D4A055" />
+      <Ellipse cx="98" cy="136" rx="16" ry="12" fill="#D4A055" />
+      <Rect x="83" y="142" width="29" height="7" rx="3" fill={col} />
+      <Circle cx="98" cy="146" r="3" fill="#FFD166" />
+      <Ellipse cx="98" cy="115" rx="23" ry="21" fill="#D4A055" />
+      <Ellipse cx="91" cy="111" rx="12" ry="9" fill="#EEC070" opacity="0.5" />
+      <Ellipse cx="78" cy="121" rx="9" ry="16" fill="#C08030" rotation="-14" originX="78" originY="121" />
+      <Ellipse cx="118" cy="121" rx="9" ry="16" fill="#C08030" rotation="14" originX="118" originY="121" />
+      <Ellipse cx="98" cy="128" rx="12" ry="9" fill="#C89040" />
+      <Ellipse cx="98" cy="124" rx="9" ry="6" fill="#DCAA5A" />
+      <Ellipse cx="98" cy="120" rx="6" ry="4" fill="#2C1810" />
+      <Circle cx="88" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="109" cy="112" r="5" fill="#2C1810" />
+      <Circle cx="86.5" cy="110.5" r="1.8" fill="white" />
+      <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
+      <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
+      <G rotation={wag} originX="122" originY="160">
+        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
+        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
+      </G>
+    </G>
+  );
+}
+
 function Human({ pose }: { pose: string }) {
   const isBack = pose === 'leave_back' || pose === 'walk_pull';
   return (
@@ -436,11 +550,23 @@ function Human({ pose }: { pose: string }) {
       <Ellipse cx="253" cy="199" rx="8" ry="4" fill="#1A1A2E" />
       <Rect x="231" y="103" width="31" height="51" rx="9" fill={isBack ? '#E85A24' : '#FF6B35'} />
       <Rect x="231" y="103" width="31" height="12" rx="9" fill={isBack ? '#D04E1A' : '#E85A24'} />
-      {pose === 'sit' && (
+      {(pose === 'sit' || pose === 'trick_spin') && (
         <G>
           <Rect x="220" y="108" width="16" height="8" rx="4" fill="#E8956A" rotation="55" originX="231" originY="112" />
           <Circle cx="212" cy="136" r="6" fill="#E8956A" />
           <Rect x="209" y="129" width="7" height="6" rx="2" fill="#FFD166" />
+        </G>
+      )}
+      {pose === 'trick_paw' && (
+        <G>
+          <Rect x="205" y="140" width="26" height="8" rx="4" fill="#E8956A" rotation="35" originX="231" originY="144" />
+          <Circle cx="203" cy="152" r="6" fill="#E8956A" />
+        </G>
+      )}
+      {pose === 'trick_high5' && (
+        <G>
+          <Rect x="209" y="116" width="26" height="8" rx="4" fill="#E8956A" rotation="18" originX="231" originY="120" />
+          <Circle cx="206" cy="124" r="6" fill="#E8956A" />
         </G>
       )}
       {pose === 'come' && (
@@ -594,6 +720,9 @@ export default function DogScene({ illustration, language, size = 300 }: DogScen
             {illustration === 'walk_pull' && <DogWalkPull col={col} wag={tailAngle} />}
             {illustration === 'walk_sit' && <DogWalkSit col={col} wag={tailAngle} />}
             {illustration === 'walk_stay' && <DogWalkStay col={col} wag={tailAngle} language={language} />}
+            {illustration === 'trick_paw' && <DogTrickPaw col={col} wag={tailAngle} />}
+            {illustration === 'trick_high5' && <DogTrickHigh5 col={col} wag={tailAngle} />}
+            {illustration === 'trick_spin' && <DogTrickSpin col={col} wag={tailAngle} />}
           </G>
         )}
       </Svg>

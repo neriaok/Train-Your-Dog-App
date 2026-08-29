@@ -50,6 +50,15 @@ const CONTENT: Record<Language, Record<number, LevelText>> = {
         3: { commands: ["לידי", "שב", "הישאר"], tip: "תרגלו פעמיים נוספות, ולפני שממשיכים בהליכה הוסיפו את פקודת הישאר. זה מלמד את הכלב לחכות בסבלנות לפני שיוצאים לדרך." },
       },
     },
+    5: {
+      title: "טריקים כיפיים",
+      subtitle: "מהנה ובונה קשר",
+      steps: {
+        1: { commands: ["תן כף"], tip: "החזיקו חטיף באגרוף סגור מול הכלב. כשהוא ינסה לגעת או לגרד עם הכף - אמרו תן כף ופתחו את היד לתגמול. חזרו כמה פעמים." },
+        2: { commands: ["תן כף", "גבוה"], tip: "אחרי שהכלב שולט בתן כף, הרימו את היד קצת יותר גבוה ואמרו גבוה. תגמלו כל ניסיון להרים את הכף מעלה." },
+        3: { commands: ["תן כף", "גבוה", "הסתובב"], tip: "החזיקו חטיף קרוב לאף הכלב והובילו אותו במעגל שלם תוך אמירת הסתובב. תגמלו ברגע שמשלים סיבוב." },
+      },
+    },
   },
   en: {
     1: {
@@ -86,6 +95,15 @@ const CONTENT: Record<Language, Record<number, LevelText>> = {
         1: { commands: ["Heel"], tip: "Put on the leash and go for a walk. The moment the dog pulls - stop and start walking the opposite way. Repeat this every time they pull, so they learn they need to follow you." },
         2: { commands: ["Heel", "Sit"], tip: "Practice the stop-and-reverse twice. Each time you stop, ask the dog to Sit. When they sit without pulling - reward right away with a treat and praise." },
         3: { commands: ["Heel", "Sit", "Stay"], tip: "Practice twice more, and before continuing the walk add the Stay command. This teaches the dog to wait patiently before heading out." },
+      },
+    },
+    5: {
+      title: "Fun Tricks",
+      subtitle: "Fun and bonding",
+      steps: {
+        1: { commands: ["Paw"], tip: "Hold a treat in a closed fist in front of the dog. When they try to touch or scratch it with a paw - say Paw and open your hand to reward. Repeat a few times." },
+        2: { commands: ["Paw", "High Five"], tip: "Once the dog has Paw down, raise your hand a bit higher and say High Five. Reward any attempt to lift the paw upward." },
+        3: { commands: ["Paw", "High Five", "Spin"], tip: "Hold a treat close to the dog's nose and lead them in a full circle while saying Spin. Reward the moment they complete the turn." },
       },
     },
   },

@@ -2,7 +2,8 @@ export type IllustrationKey =
   | 'sit' | 'come' | 'down'
   | 'crate_enter' | 'crate_return' | 'crate_full'
   | 'leave_close' | 'leave_back' | 'leave_walk'
-  | 'walk_pull' | 'walk_sit' | 'walk_stay';
+  | 'walk_pull' | 'walk_sit' | 'walk_stay'
+  | 'trick_paw' | 'trick_high5' | 'trick_spin';
 
 export interface Step {
   id: number;
@@ -88,6 +89,18 @@ export const LEVEL_SKELETONS: LevelSkeleton[] = [
       { id: 1, emoji: "🔄", illustration: "walk_pull" },
       { id: 2, emoji: "🪑", illustration: "walk_sit" },
       { id: 3, emoji: "✋", illustration: "walk_stay" },
+    ],
+  },
+  {
+    id: 5,
+    emoji: "🙌",
+    color: "#E8A317",
+    colorLight: "#FFF7E0",
+    colorMid: "#FFD98A",
+    steps: [
+      { id: 1, emoji: "🐾", illustration: "trick_paw" },
+      { id: 2, emoji: "🙌", illustration: "trick_high5" },
+      { id: 3, emoji: "🌀", illustration: "trick_spin" },
     ],
   },
 ];

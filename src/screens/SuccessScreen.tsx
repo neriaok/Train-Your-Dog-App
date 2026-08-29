@@ -29,7 +29,10 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
 
   const nextLevel = levels.find(l => l.id === level.id + 1);
   const successPose =
-    level.id === 2 ? 'crate_full' : level.id === 3 ? 'leave_walk' : level.id === 4 ? 'walk_stay' : 'sit';
+    level.id === 2 ? 'crate_full' :
+      level.id === 3 ? 'leave_walk' :
+        level.id === 4 ? 'walk_stay' :
+          level.id === 5 ? 'trick_spin' : 'sit';
 
   useEffect(() => {
     Animated.parallel([
