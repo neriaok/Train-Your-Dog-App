@@ -4,7 +4,9 @@
 
 **https://train-your-dog-app-nerias-projects-33ce4739.vercel.app**
 
-גרסת ה-web של האפליקציה, זמינה מכל מכשיר (כולל פלאפון) בלי צורך שמחשב הפיתוח יהיה דלוק. פריסה: `npx expo export --platform web && vercel deploy --prod --yes --cwd ./dist`.
+גרסת ה-web של האפליקציה, זמינה מכל מכשיר (כולל פלאפון) בלי צורך שמחשב הפיתוח יהיה דלוק.
+
+לפריסת גרסה מעודכנת: `npm run deploy:web`. **חשוב:** אל תפרסו עם `expo export` + `vercel deploy` ישירות - `expo export` שם את קובצי הפונט תחת נתיב שמכיל תיקייה בשם `node_modules`, ו-Vercel מתעלם אוטומטית מכל נתיב כזה, מה שישבור את הטעינה. `deploy:web` (ב-`scripts/deploy-web.js`) מטפל בזה אוטומטית לפני הפריסה.
 
 ## התקנה ורצה מהיר
 
