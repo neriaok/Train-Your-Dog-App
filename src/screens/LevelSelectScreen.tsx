@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProgressBar from '../components/ProgressBar';
@@ -24,6 +24,9 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
   const { user, isPremium, signOut } = useAuth();
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
+  const [showTeaser, setShowTeaser] = useState(false);
+  const teaserOpacity = useRef(new Animated.Value(0)).current;
+  const teaserSlide = useRef(new Animated.Value(-10)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -31,6 +34,25 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
       Animated.spring(slide, { toValue: 0, useNativeDriver: true }),
     ]).start();
   }, []);
+
+  useEffect(() => {
+    const showTimer = setTimeout(() => {
+      setShowTeaser(true);
+      Animated.parallel([
+        Animated.timing(teaserOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(teaserSlide, { toValue: 0, useNativeDriver: true, speed: 14, bounciness: 6 }),
+      ]).start();
+    }, 1000);
+    const hideTimer = setTimeout(() => dismissTeaser(), 7000);
+    return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
+  }, []);
+
+  const dismissTeaser = () => {
+    Animated.timing(teaserOpacity, { toValue: 0, duration: 200, useNativeDriver: true })
+      .start(() => setShowTeaser(false));
+  };
+
+  const openAgent = () => { dismissTeaser(); onOpenAgent(); };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -97,12 +119,6 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
                 </View>
               )}
               <View style={styles.cardRow}>
-                <View style={[
-                  styles.iconBox,
-                  { backgroundColor: locked ? C.border : premiumLocked ? C.purpleL : lvl.color + '22' }
-                ]}>
-                  <Text style={styles.iconText}>{locked ? '🔒' : premiumLocked ? '👑' : lvl.emoji}</Text>
-                </View>
                 <View style={[styles.cardText, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
                   <Text style={[styles.levelNum, { color: locked ? C.soft : premiumLocked ? C.purple : lvl.color, textAlign: isRTL ? 'right' : 'left' }]}>
                     {t.levelLabel(lvl.id)}
@@ -114,6 +130,12 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
                     {lvl.subtitle} - {t.stepsCount(lvl.steps.length)}
                   </Text>
                 </View>
+                <View style={[
+                  styles.iconBox,
+                  { backgroundColor: locked ? C.border : premiumLocked ? C.purpleL : lvl.color + '22' }
+                ]}>
+                  <Text style={styles.iconText}>{locked ? '🔒' : premiumLocked ? '👑' : lvl.emoji}</Text>
+                </View>
                 {!locked && (
                   <Text style={[styles.arrow, { color: premiumLocked ? C.purple : lvl.color }]}>{isRTL ? '←' : '→'}</Text>
                 )}
@@ -121,15 +143,24 @@ export default function LevelSelectScreen({ levels, completed, onSelect, onOpenA
             </PressableScale>
           );
         })}
-
-        <PressableScale onPress={onOpenAgent} scaleTo={0.98} style={styles.agentCard}>
-          <Text style={styles.agentEmoji}>🤖</Text>
-          <View style={[styles.agentText, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-            <Text style={[styles.agentTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentTitle}</Text>
-            <Text style={[styles.agentSub, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentSub}</Text>
-          </View>
-        </PressableScale>
       </ScrollView>
+
+      <View pointerEvents="box-none" style={[styles.fabWrap, isRTL ? { left: 16 } : { right: 16 }]}>
+        {showTeaser && (
+          <Animated.View style={[styles.teaser, { opacity: teaserOpacity, transform: [{ translateY: teaserSlide }] }]}>
+            <PressableScale onPress={dismissTeaser} style={styles.teaserClose}>
+              <Text style={styles.teaserCloseText}>×</Text>
+            </PressableScale>
+            <PressableScale onPress={openAgent} style={styles.teaserBody}>
+              <Text style={[styles.teaserTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentTitle}</Text>
+              <Text style={[styles.teaserSub, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentSub}</Text>
+            </PressableScale>
+          </Animated.View>
+        )}
+        <PressableScale onPress={openAgent} scaleTo={0.92} style={styles.fab}>
+          <Text style={styles.fabIcon}>🤖</Text>
+        </PressableScale>
+      </View>
     </SafeAreaView>
   );
 }
@@ -180,13 +211,29 @@ const styles = StyleSheet.create({
   levelTitle: { fontSize: 17, fontFamily: 'Heebo_800ExtraBold', marginBottom: 3 },
   levelSub: { fontSize: 13, color: C.soft, fontFamily: 'Heebo_400Regular' },
   arrow: { fontSize: 16 },
-  agentCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    backgroundColor: C.purpleL, borderRadius: 20, padding: 16,
-    borderWidth: 1.5, borderColor: C.purple + '40', marginTop: 4,
+  fabWrap: {
+    position: 'absolute', bottom: 20, flexDirection: 'row', alignItems: 'flex-end', gap: 10,
   },
-  agentEmoji: { fontSize: 30 },
-  agentText: { flex: 1 },
-  agentTitle: { fontSize: 15, fontFamily: 'Heebo_800ExtraBold', color: C.purple, marginBottom: 2 },
-  agentSub: { fontSize: 12, color: C.soft, fontFamily: 'Heebo_400Regular' },
+  fab: {
+    width: 56, height: 56, borderRadius: 28, backgroundColor: C.purple,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18, shadowRadius: 10, elevation: 6,
+  },
+  fabIcon: { fontSize: 26 },
+  teaser: {
+    maxWidth: 220, backgroundColor: C.white, borderRadius: 16, paddingVertical: 10,
+    paddingHorizontal: 14, marginBottom: 4,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12, shadowRadius: 10, elevation: 5,
+    borderWidth: 1, borderColor: C.border,
+  },
+  teaserBody: { paddingRight: 14 },
+  teaserClose: {
+    position: 'absolute', top: 4, right: 6, width: 20, height: 20,
+    alignItems: 'center', justifyContent: 'center', zIndex: 1,
+  },
+  teaserCloseText: { fontSize: 15, color: C.soft, lineHeight: 16 },
+  teaserTitle: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.purple, marginBottom: 2 },
+  teaserSub: { fontSize: 11.5, color: C.soft, fontFamily: 'Heebo_400Regular', lineHeight: 16 },
 });
