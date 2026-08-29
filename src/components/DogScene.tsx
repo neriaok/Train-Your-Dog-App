@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, Easing } from 'react-native';
 import Svg, {
   Ellipse, Rect, Circle, Path, Line, Polygon, Text as SvgText, G
@@ -39,7 +39,25 @@ const waitLabel: Record<Language, string> = { he: 'רגע...', en: 'Wait...' };
 // Leash color, shared by all walk_* poses
 const LEASH_COLOR = '#8B6340';
 
-function DogSit({ col, wag }: { col: string; wag: number }) {
+// Wag is an Animated node (not a plain number) so the tail rotates via
+// Animated's own per-frame prop updates instead of a React re-render on
+// every tick - the rest of the (much heavier) dog illustration never
+// re-renders just because the tail is wagging.
+type WagValue = Animated.Value | Animated.AnimatedInterpolation<string | number>;
+const AnimatedG = Animated.createAnimatedComponent(G);
+
+function Tail({ wag, originX, originY, d, widths = [10, 6] }: {
+  wag: WagValue; originX: number; originY: number; d: string; widths?: [number, number];
+}) {
+  return (
+    <AnimatedG rotation={wag as unknown as number} originX={originX} originY={originY}>
+      <Path d={d} stroke="#B87830" strokeWidth={widths[0]} fill="none" strokeLinecap="round" />
+      <Path d={d} stroke="#D4A055" strokeWidth={widths[1]} fill="none" strokeLinecap="round" />
+    </AnimatedG>
+  );
+}
+
+function DogSit({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
@@ -66,16 +84,12 @@ function DogSit({ col, wag }: { col: string; wag: number }) {
       <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
       <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
-      {/* Tail */}
-      <G rotation={wag} originX="122" originY="160">
-        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={122} originY={160} d="M122 160 Q141 141 146 126" />
     </G>
   );
 }
 
-function DogCome({ col, wag }: { col: string; wag: number }) {
+function DogCome({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
@@ -102,15 +116,12 @@ function DogCome({ col, wag }: { col: string; wag: number }) {
       <Circle cx="62.5" cy="134.5" r="1.8" fill="white" />
       <Circle cx="77.5" cy="133.5" r="1.8" fill="white" />
       <Path d="M47 152 Q51 161 49 166 Q53 171 57 166 Q55 161 59 152" fill="#D4608A" />
-      <G rotation={wag} originX="132" originY="163">
-        <Path d="M132 163 Q150 141 154 122" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M132 163 Q150 141 154 122" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={132} originY={163} d="M132 163 Q150 141 154 122" />
     </G>
   );
 }
 
-function DogDown({ col, wag }: { col: string; wag: number }) {
+function DogDown({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="48" ry="6" fill="#90B860" opacity="0.4" />
@@ -132,15 +143,12 @@ function DogDown({ col, wag }: { col: string; wag: number }) {
       <Ellipse cx="44" cy="174" rx="5" ry="3" fill="#2C1810" />
       <Path d="M57 162 Q62 158 67 162" stroke="#2C1810" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <Path d="M71 161 Q76 157 81 161" stroke="#2C1810" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <G rotation={wag} originX="144" originY="190">
-        <Path d="M144 190 Q160 183 168 174" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M144 190 Q160 183 168 174" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={144} originY={190} d="M144 190 Q160 183 168 174" />
     </G>
   );
 }
 
-function CrateAndDog({ open, col, wag }: { open: boolean; col: string; wag: number }) {
+function CrateAndDog({ open, col, wag }: { open: boolean; col: string; wag: WagValue }) {
   return (
     <G>
       {/* Crate */}
@@ -183,15 +191,12 @@ function CrateAndDog({ open, col, wag }: { open: boolean; col: string; wag: numb
       <Circle cx="51" cy="118" r="4" fill="#2C1810" />
       <Circle cx="36.5" cy="117.5" r="1.4" fill="white" />
       <Circle cx="49.5" cy="116.5" r="1.4" fill="white" />
-      <G rotation={wag} originX="88" originY="141">
-        <Path d="M88 141 Q102 128 105 115" stroke="#B87830" strokeWidth="9" fill="none" strokeLinecap="round" />
-        <Path d="M88 141 Q102 128 105 115" stroke="#D4A055" strokeWidth="5" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={88} originY={141} d="M88 141 Q102 128 105 115" widths={[9, 5]} />
     </G>
   );
 }
 
-function DogLeaveClose({ col, wag }: { col: string; wag: number }) {
+function DogLeaveClose({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       {/* Bone */}
@@ -225,15 +230,12 @@ function DogLeaveClose({ col, wag }: { col: string; wag: number }) {
       <Path d="M118 130 Q119 137 118 142" stroke="#A0C8F0" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.8" />
       <Circle cx="118" cy="144" r="3" fill="#A0C8F0" opacity="0.7" />
       <Path d="M152 192 Q138 174 120 128" stroke="#9B5DE5" strokeWidth="1.5" strokeDasharray="4 3" fill="none" opacity="0.5" />
-      <G rotation={wag} originX="113" originY="158">
-        <Path d="M113 158 Q122 174 120 183" stroke="#B87830" strokeWidth="9" fill="none" strokeLinecap="round" />
-        <Path d="M113 158 Q122 174 120 183" stroke="#D4A055" strokeWidth="5" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={113} originY={158} d="M113 158 Q122 174 120 183" widths={[9, 5]} />
     </G>
   );
 }
 
-function DogLeaveBack({ col, wag }: { col: string; wag: number }) {
+function DogLeaveBack({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Rect x="148" y="192" width="18" height="5" rx="2" fill="#E8C080" />
@@ -264,15 +266,12 @@ function DogLeaveBack({ col, wag }: { col: string; wag: number }) {
       <Path d="M80 129 Q87 135 94 129" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="87" cy="131" rx="4" ry="3" fill="#D4608A" opacity="0.7" />
       <SvgText x="87" y="90" textAnchor="middle" fontSize="18" fill="#06D6A0" fontWeight="800">V</SvgText>
-      <G rotation={wag} originX="109" originY="160">
-        <Path d="M109 160 Q128 141 132 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M109 160 Q128 141 132 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={109} originY={160} d="M109 160 Q128 141 132 126" />
     </G>
   );
 }
 
-function DogLeaveWalk({ col, wag, language }: { col: string; wag: number; language: Language }) {
+function DogLeaveWalk({ col, wag, language }: { col: string; wag: WagValue; language: Language }) {
   return (
     <G>
       <Rect x="128" y="192" width="18" height="5" rx="2" fill="#E8C080" />
@@ -306,15 +305,12 @@ function DogLeaveWalk({ col, wag, language }: { col: string; wag: number; langua
       <Ellipse cx="72" cy="130" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
       <SvgText x="72" y="88" fontSize="15" fill="#FFD166" textAnchor="middle">&#11088;</SvgText>
       <SvgText x="72" y="75" fontSize="10" fill="#9B5DE5" textAnchor="middle" fontWeight="800">{wellDoneLabel[language]}</SvgText>
-      <G rotation={wag} originX="93" originY="158">
-        <Path d="M93 158 Q110 139 114 124" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M93 158 Q110 139 114 124" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={93} originY={158} d="M93 158 Q110 139 114 124" />
     </G>
   );
 }
 
-function DogWalkPull({ col, wag }: { col: string; wag: number }) {
+function DogWalkPull({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       {/* Taut leash - drawn first so the dog sits on top of it */}
@@ -343,10 +339,7 @@ function DogWalkPull({ col, wag }: { col: string; wag: number }) {
       <Circle cx="62.5" cy="134.5" r="1.8" fill="white" />
       <Circle cx="77.5" cy="133.5" r="1.8" fill="white" />
       <Path d="M47 152 Q51 161 49 166 Q53 171 57 166 Q55 161 59 152" fill="#D4608A" />
-      <G rotation={wag} originX="132" originY="163">
-        <Path d="M132 163 Q150 141 154 122" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M132 163 Q150 141 154 122" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={132} originY={163} d="M132 163 Q150 141 154 122" />
       {/* "Turn around" cue */}
       <Path d="M258 188 Q274 176 258 164" stroke={col} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <Polygon points="253,167 262,162 262,173" fill={col} />
@@ -354,7 +347,7 @@ function DogWalkPull({ col, wag }: { col: string; wag: number }) {
   );
 }
 
-function DogWalkSit({ col, wag }: { col: string; wag: number }) {
+function DogWalkSit({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Path d="M112 148 Q160 186 200 125" stroke={LEASH_COLOR} strokeWidth="2.5" fill="none" strokeLinecap="round" />
@@ -382,15 +375,12 @@ function DogWalkSit({ col, wag }: { col: string; wag: number }) {
       <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
       <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
-      <G rotation={wag} originX="122" originY="160">
-        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={122} originY={160} d="M122 160 Q141 141 146 126" />
     </G>
   );
 }
 
-function DogWalkStay({ col, wag, language }: { col: string; wag: number; language: Language }) {
+function DogWalkStay({ col, wag, language }: { col: string; wag: WagValue; language: Language }) {
   return (
     <G>
       <Line x1="115" y1="176" x2="205" y2="176" stroke={col} strokeWidth="1.5" strokeDasharray="5 4" opacity="0.4" />
@@ -420,15 +410,12 @@ function DogWalkStay({ col, wag, language }: { col: string; wag: number; languag
       <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
       <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
-      <G rotation={wag} originX="122" originY="160">
-        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={122} originY={160} d="M122 160 Q141 141 146 126" />
     </G>
   );
 }
 
-function DogTrickPaw({ col, wag }: { col: string; wag: number }) {
+function DogTrickPaw({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
@@ -456,15 +443,12 @@ function DogTrickPaw({ col, wag }: { col: string; wag: number }) {
       {/* Raised paw, offered toward the human */}
       <Rect x="100" y="168" width="11" height="26" rx="5" fill="#D4A055" rotation="-55" originX="100" originY="180" />
       <Ellipse cx="123" cy="163" rx="8" ry="5" fill="#B87830" rotation="-30" originX="123" originY="163" />
-      <G rotation={wag} originX="122" originY="160">
-        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={122} originY={160} d="M122 160 Q141 141 146 126" />
     </G>
   );
 }
 
-function DogTrickHigh5({ col, wag }: { col: string; wag: number }) {
+function DogTrickHigh5({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       <Ellipse cx="100" cy="198" rx="36" ry="6" fill="#90B860" opacity="0.4" />
@@ -493,15 +477,12 @@ function DogTrickHigh5({ col, wag }: { col: string; wag: number }) {
       <Rect x="103" y="128" width="11" height="34" rx="5" fill="#D4A055" rotation="-72" originX="103" originY="160" />
       <Ellipse cx="132" cy="120" rx="8" ry="5" fill="#B87830" rotation="-15" originX="132" originY="120" />
       <SvgText x="140" y="112" fontSize="14" textAnchor="middle">&#10024;</SvgText>
-      <G rotation={wag} originX="122" originY="160">
-        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={122} originY={160} d="M122 160 Q141 141 146 126" />
     </G>
   );
 }
 
-function DogTrickSpin({ col, wag }: { col: string; wag: number }) {
+function DogTrickSpin({ col, wag }: { col: string; wag: WagValue }) {
   return (
     <G>
       {/* Motion swirl around the dog */}
@@ -531,10 +512,7 @@ function DogTrickSpin({ col, wag }: { col: string; wag: number }) {
       <Circle cx="107.5" cy="110.5" r="1.8" fill="white" />
       <Path d="M91 131 Q98 138 105 131" stroke="#A06828" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       <Ellipse cx="98" cy="133" rx="4" ry="3" fill="#D4608A" opacity="0.85" />
-      <G rotation={wag} originX="122" originY="160">
-        <Path d="M122 160 Q141 141 146 126" stroke="#B87830" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <Path d="M122 160 Q141 141 146 126" stroke="#D4A055" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </G>
+      <Tail wag={wag} originX={122} originY={160} d="M122 160 Q141 141 146 126" />
     </G>
   );
 }
@@ -671,7 +649,6 @@ export default function DogScene({ illustration, language, size = 300 }: DogScen
 
   const bob = useRef(new Animated.Value(0)).current;
   const tailPhase = useRef(new Animated.Value(0)).current;
-  const [tailAngle, setTailAngle] = useState(-10);
 
   useEffect(() => {
     const bobLoop = Animated.loop(
@@ -686,21 +663,28 @@ export default function DogScene({ illustration, language, size = 300 }: DogScen
         Animated.timing(tailPhase, { toValue: 0, duration: 260, easing: Easing.inOut(Easing.quad), useNativeDriver: false }),
       ])
     );
-    const listenerId = tailPhase.addListener(({ value }) => setTailAngle(-10 + value * 20));
     bobLoop.start();
     tailLoop.start();
-    return () => { bobLoop.stop(); tailLoop.stop(); tailPhase.removeListener(listenerId); };
+    return () => { bobLoop.stop(); tailLoop.stop(); };
   }, []);
 
+  // Passed straight into each pose as an Animated node (see Tail above) -
+  // no per-frame setState, so wagging the tail doesn't re-render the dog.
+  const wag = tailPhase.interpolate({ inputRange: [0, 1], outputRange: [-10, 10] });
+
   const translateY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, -5] });
-  const scale = bob.interpolate({ inputRange: [0, 1], outputRange: [1, 1.012] });
+  // Light squash-and-stretch: the dog stretches taller/thinner near the top
+  // of the bob and settles back to normal at the bottom, for a bit more
+  // life than a plain uniform scale would give.
+  const scaleY = bob.interpolate({ inputRange: [0, 1], outputRange: [1, 1.02] });
+  const scaleX = bob.interpolate({ inputRange: [0, 1], outputRange: [1, 0.985] });
 
   return (
-    <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
+    <Animated.View style={{ transform: [{ translateY }, { scaleX }, { scaleY }] }}>
       <Svg width={size} height={size * 0.66} viewBox="0 0 320 210">
         <Ellipse cx="160" cy="204" rx="145" ry="8" fill="#D4E8B0" opacity="0.6" />
         <Line x1="15" y1="204" x2="305" y2="204" stroke="#A8CC78" strokeWidth="1.5" />
-        {isCrateScene && <CrateAndDog open={isOpen} col={col} wag={tailAngle} />}
+        {isCrateScene && <CrateAndDog open={isOpen} col={col} wag={wag} />}
         <Human pose={illustration} />
         {/* Bubble */}
         <Rect x="265" y="36" width={bubbleWidth} height="32" rx="13" fill="white" stroke="#6B5CE7" strokeWidth="1.5" />
@@ -711,18 +695,18 @@ export default function DogScene({ illustration, language, size = 300 }: DogScen
         </SvgText>
         {!isCrateScene && (
           <G>
-            {illustration === 'sit' && <DogSit col={col} wag={tailAngle} />}
-            {illustration === 'come' && <DogCome col={col} wag={tailAngle} />}
-            {illustration === 'down' && <DogDown col={col} wag={tailAngle} />}
-            {illustration === 'leave_close' && <DogLeaveClose col={col} wag={tailAngle} />}
-            {illustration === 'leave_back' && <DogLeaveBack col={col} wag={tailAngle} />}
-            {illustration === 'leave_walk' && <DogLeaveWalk col={col} wag={tailAngle} language={language} />}
-            {illustration === 'walk_pull' && <DogWalkPull col={col} wag={tailAngle} />}
-            {illustration === 'walk_sit' && <DogWalkSit col={col} wag={tailAngle} />}
-            {illustration === 'walk_stay' && <DogWalkStay col={col} wag={tailAngle} language={language} />}
-            {illustration === 'trick_paw' && <DogTrickPaw col={col} wag={tailAngle} />}
-            {illustration === 'trick_high5' && <DogTrickHigh5 col={col} wag={tailAngle} />}
-            {illustration === 'trick_spin' && <DogTrickSpin col={col} wag={tailAngle} />}
+            {illustration === 'sit' && <DogSit col={col} wag={wag} />}
+            {illustration === 'come' && <DogCome col={col} wag={wag} />}
+            {illustration === 'down' && <DogDown col={col} wag={wag} />}
+            {illustration === 'leave_close' && <DogLeaveClose col={col} wag={wag} />}
+            {illustration === 'leave_back' && <DogLeaveBack col={col} wag={wag} />}
+            {illustration === 'leave_walk' && <DogLeaveWalk col={col} wag={wag} language={language} />}
+            {illustration === 'walk_pull' && <DogWalkPull col={col} wag={wag} />}
+            {illustration === 'walk_sit' && <DogWalkSit col={col} wag={wag} />}
+            {illustration === 'walk_stay' && <DogWalkStay col={col} wag={wag} language={language} />}
+            {illustration === 'trick_paw' && <DogTrickPaw col={col} wag={wag} />}
+            {illustration === 'trick_high5' && <DogTrickHigh5 col={col} wag={wag} />}
+            {illustration === 'trick_spin' && <DogTrickSpin col={col} wag={wag} />}
           </G>
         )}
       </Svg>

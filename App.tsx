@@ -4,7 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts, Heebo_400Regular, Heebo_500Medium, Heebo_600SemiBold, Heebo_700Bold, Heebo_800ExtraBold } from '@expo-google-fonts/heebo';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Animated } from 'react-native';
+import { View, Animated, Easing } from 'react-native';
 
 import SplashScreenComp from './src/screens/SplashScreen';
 import LevelSelectScreen from './src/screens/LevelSelectScreen';
@@ -62,7 +62,9 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
 
   useEffect(() => {
     screenFade.setValue(0);
-    Animated.timing(screenFade, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+    Animated.timing(screenFade, {
+      toValue: 1, duration: 380, easing: Easing.out(Easing.cubic), useNativeDriver: true,
+    }).start();
   }, [screen]);
 
   if (!progressLoaded || !languageReady || !authReady) return null;
@@ -109,7 +111,13 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   return (
     <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
       <StatusBar style="dark" />
-      <Animated.View style={{ flex: 1, opacity: screenFade }}>
+      <Animated.View
+        style={{
+          flex: 1,
+          opacity: screenFade,
+          transform: [{ scale: screenFade.interpolate({ inputRange: [0, 1], outputRange: [0.98, 1] }) }],
+        }}
+      >
         {screen === 'splash' && <SplashScreenComp onStart={handleStart} onOpenAuth={handleOpenAuth} />}
         {screen === 'levels' && (
           <LevelSelectScreen
