@@ -40,8 +40,10 @@ export function DogProfileProvider({ children }: { children: ReactNode }) {
       photoUri: p.photoUri,
       startDate: profile?.startDate ?? new Date().toISOString().slice(0, 10),
     };
-    setProfile(next);
+    // Write first so a failed save (e.g. a photo too large for storage)
+    // never leaves the in-memory profile showing data that wasn't persisted.
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    setProfile(next);
   };
 
   return (

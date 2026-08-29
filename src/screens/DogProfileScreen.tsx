@@ -20,6 +20,7 @@ export default function DogProfileScreen({ onBack }: Props) {
   const [breed, setBreed] = useState(profile?.breed ?? '');
   const [photoUri, setPhotoUri] = useState<string | null>(profile?.photoUri ?? null);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const pickPhoto = async () => {
     if (Platform.OS !== 'web') {
@@ -42,8 +43,14 @@ export default function DogProfileScreen({ onBack }: Props) {
       return;
     }
     setError(null);
-    await saveProfile({ name: trimmed, breed: breed.trim(), photoUri });
-    onBack();
+    setBusy(true);
+    try {
+      await saveProfile({ name: trimmed, breed: breed.trim(), photoUri });
+      onBack();
+    } catch {
+      setBusy(false);
+      setError(t.saveFailed);
+    }
   };
 
   return (
@@ -88,8 +95,8 @@ export default function DogProfileScreen({ onBack }: Props) {
           )}
           {error && <Text style={authStyles.error}>{error}</Text>}
 
-          <PressableScale onPress={handleSave} style={authStyles.submitBtn}>
-            <Text style={authStyles.submitText}>{t.saveBtn}</Text>
+          <PressableScale onPress={handleSave} disabled={busy} style={authStyles.submitBtn}>
+            <Text style={authStyles.submitText}>{busy ? '...' : t.saveBtn}</Text>
           </PressableScale>
         </View>
       </ScrollView>

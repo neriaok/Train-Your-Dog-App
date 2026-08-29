@@ -101,6 +101,7 @@ export const STRINGS = {
       since: (date: string) => `מתאמנים יחד מ-${date}`,
       saveBtn: 'שמירה',
       nameRequired: 'צריך למלא שם כדי לשמור',
+      saveFailed: 'השמירה נכשלה - ייתכן שהתמונה גדולה מדי. נסו תמונה קטנה יותר.',
     },
   },
   en: {
@@ -203,6 +204,7 @@ export const STRINGS = {
       since: (date: string) => `Training together since ${date}`,
       saveBtn: 'Save',
       nameRequired: 'Enter a name to save',
+      saveFailed: 'Save failed - the photo might be too large. Try a smaller image.',
     },
   },
 } as const;
