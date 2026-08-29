@@ -1,5 +1,11 @@
 # מאלפים יחד - Dog Training App
 
+## גרסה חיה
+
+**https://train-your-dog-app-nerias-projects-33ce4739.vercel.app**
+
+גרסת ה-web של האפליקציה, זמינה מכל מכשיר (כולל פלאפון) בלי צורך שמחשב הפיתוח יהיה דלוק. פריסה: `npx expo export --platform web && vercel deploy --prod --yes --cwd ./dist`.
+
 ## התקנה ורצה מהיר
 
 ```bash
