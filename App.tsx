@@ -18,6 +18,7 @@ import JournalScreen from './src/screens/JournalScreen';
 import { LanguageProvider, useLanguage } from './src/i18n/LanguageContext';
 import { useLevels } from './src/i18n/useLevels';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
+import { supabase } from './src/auth/supabaseClient';
 import { DogProfileProvider } from './src/profile/DogProfileContext';
 import { JournalProvider } from './src/journal/JournalContext';
 import { loadStreak, recordPractice, StreakState } from './src/progress/streak';
@@ -27,40 +28,89 @@ SplashScreen.preventAutoHideAsync();
 type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent' | 'auth' | 'upgrade' | 'profile' | 'journal';
 
 const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
+const CURRENT_POSITION_KEY = 'dogTrainingApp:currentPosition';
 
 function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const { isRTL, ready: languageReady } = useLanguage();
-  const { ready: authReady, isPremium } = useAuth();
+  const { ready: authReady, isPremium, isMock, user } = useAuth();
   const LEVELS = useLevels();
 
   const [screen, setScreen] = useState<Screen>('splash');
   const [levelId, setLevelId] = useState(1);
   const [stepIdx, setStepIdx] = useState(0);
   const [completed, setCompleted] = useState<number[]>([]);
+  const [savedPosition, setSavedPosition] = useState<{ levelId: number; stepIdx: number } | null>(null);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const hasLoadedProgress = useRef(false);
   const screenFade = useRef(new Animated.Value(1)).current;
   const [streak, setStreak] = useState<StreakState>({ streak: 0, lastActiveDate: null, practicedToday: false });
 
   useEffect(() => {
-    AsyncStorage.getItem(COMPLETED_LEVELS_KEY)
-      .then(stored => {
-        if (stored) setCompleted(JSON.parse(stored));
-      })
-      .finally(() => setProgressLoaded(true));
-    loadStreak().then(setStreak);
-  }, []);
+    setProgressLoaded(false);
+    hasLoadedProgress.current = false;
+    async function loadCompleted() {
+      if (isMock) {
+        const stored = await AsyncStorage.getItem(COMPLETED_LEVELS_KEY);
+        setCompleted(stored ? JSON.parse(stored) : []);
+        const posStr = await AsyncStorage.getItem(CURRENT_POSITION_KEY);
+        setSavedPosition(posStr ? JSON.parse(posStr) : null);
+      } else if (user && supabase) {
+        const { data, error } = await supabase
+          .from('progress')
+          .select('completed_levels, current_level_id, current_step_idx')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (error) console.error('Failed to load progress:', error.message);
+        setCompleted(data?.completed_levels ?? []);
+        setSavedPosition(
+          data?.current_level_id != null
+            ? { levelId: Number(data.current_level_id), stepIdx: Number(data.current_step_idx ?? 0) }
+            : null
+        );
+      } else {
+        // Signed out (or no backend) - a previous user's position should
+        // never linger for whoever uses the app next.
+        setCompleted([]);
+        setSavedPosition(null);
+      }
+      setProgressLoaded(true);
+    }
+    loadCompleted();
+    loadStreak(isMock, user?.id).then(setStreak);
+  }, [isMock, user?.id]);
 
   useEffect(() => {
     // Skip the very first write so we don't clobber storage with the
-    // initial empty array before the loaded progress has been applied.
+    // just-loaded progress before this effect has a real change to persist.
     if (!progressLoaded) return;
     if (!hasLoadedProgress.current) {
       hasLoadedProgress.current = true;
       return;
     }
-    AsyncStorage.setItem(COMPLETED_LEVELS_KEY, JSON.stringify(completed));
-  }, [completed, progressLoaded]);
+    if (isMock) {
+      AsyncStorage.setItem(COMPLETED_LEVELS_KEY, JSON.stringify(completed));
+    } else if (user && supabase) {
+      supabase.from('progress').upsert({ user_id: user.id, completed_levels: completed })
+        .then(({ error }) => { if (error) console.error('Failed to save completed levels:', error.message); });
+    }
+  }, [completed, progressLoaded, isMock, user?.id]);
+
+  useEffect(() => {
+    // Persists which step of which level is currently in progress, so
+    // re-entering a level later resumes there instead of always restarting
+    // at step 1 (handleSelect below reads this back via savedPosition).
+    if (!progressLoaded || screen !== 'step') return;
+    // Keep the in-memory copy current too - without this, advancing further
+    // within the same session (no reload in between) would still resume
+    // from whichever step was loaded at sign-in, not the latest one.
+    setSavedPosition({ levelId, stepIdx });
+    if (isMock) {
+      AsyncStorage.setItem(CURRENT_POSITION_KEY, JSON.stringify({ levelId, stepIdx }));
+    } else if (user && supabase) {
+      supabase.from('progress').upsert({ user_id: user.id, current_level_id: levelId, current_step_idx: stepIdx })
+        .then(({ error }) => { if (error) console.error('Failed to save level position:', error.message); });
+    }
+  }, [levelId, stepIdx, screen, progressLoaded, isMock, user?.id]);
 
   useEffect(() => {
     screenFade.setValue(0);
@@ -82,12 +132,15 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
       return;
     }
     setLevelId(id);
-    setStepIdx(0);
+    const resumeStep = savedPosition && savedPosition.levelId === id && !completed.includes(id)
+      ? savedPosition.stepIdx
+      : 0;
+    setStepIdx(resumeStep);
     setScreen('step');
   };
 
   const handleStepDone = () => {
-    recordPractice().then(setStreak);
+    recordPractice(isMock, user?.id).then(setStreak);
     if (stepIdx + 1 >= level.steps.length) {
       if (!completed.includes(levelId))
         setCompleted(p => [...p, levelId]);
