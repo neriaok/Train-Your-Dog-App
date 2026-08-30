@@ -9,8 +9,8 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  * src/auth/AuthContext.tsx) - nothing breaks either way.
  * Setup steps: backend/supabase/README.md
  */
-export const SUPABASE_URL = '';
-export const SUPABASE_ANON_KEY = '';
+export const SUPABASE_URL = 'https://zvjtwlmjmxkdzvhekkvx.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_YQt6JZGO1-B2ApX3zIr3Dw_W3dppevN';
 
 export function isSupabaseConfigured(): boolean {
   return SUPABASE_URL.trim().length > 0 && SUPABASE_ANON_KEY.trim().length > 0;
