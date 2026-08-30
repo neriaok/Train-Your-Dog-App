@@ -14,15 +14,17 @@ import AgentChatScreen from './src/screens/AgentChatScreen';
 import AuthScreen from './src/screens/AuthScreen';
 import UpgradeScreen from './src/screens/UpgradeScreen';
 import DogProfileScreen from './src/screens/DogProfileScreen';
+import JournalScreen from './src/screens/JournalScreen';
 import { LanguageProvider, useLanguage } from './src/i18n/LanguageContext';
 import { useLevels } from './src/i18n/useLevels';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
 import { DogProfileProvider } from './src/profile/DogProfileContext';
+import { JournalProvider } from './src/journal/JournalContext';
 import { loadStreak, recordPractice, StreakState } from './src/progress/streak';
 
 SplashScreen.preventAutoHideAsync();
 
-type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent' | 'auth' | 'upgrade' | 'profile';
+type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent' | 'auth' | 'upgrade' | 'profile' | 'journal';
 
 const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
 
@@ -107,6 +109,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const handleOpenAuth = () => setScreen('auth');
   const handleOpenUpgrade = () => setScreen('upgrade');
   const handleOpenProfile = () => setScreen('profile');
+  const handleOpenJournal = () => setScreen('journal');
 
   return (
     <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
@@ -130,7 +133,8 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
         {screen === 'agent' && <AgentChatScreen levels={LEVELS} onBack={handleBack} />}
         {screen === 'auth' && <AuthScreen onBack={handleBack} onAuthed={handleBack} />}
         {screen === 'upgrade' && <UpgradeScreen onBack={handleBack} onSignInRequired={handleOpenAuth} />}
-        {screen === 'profile' && <DogProfileScreen onBack={handleBack} />}
+        {screen === 'profile' && <DogProfileScreen onBack={handleBack} onOpenJournal={handleOpenJournal} />}
+        {screen === 'journal' && <JournalScreen onBack={handleBack} />}
         {screen === 'step' && level && step && (
           <StepScreen
             key={`${levelId}-${stepIdx}`}
@@ -173,7 +177,9 @@ export default function App() {
       <LanguageProvider>
         <AuthProvider>
           <DogProfileProvider>
-            <AppInner onLayoutRootView={onLayoutRootView} />
+            <JournalProvider>
+              <AppInner onLayoutRootView={onLayoutRootView} />
+            </JournalProvider>
           </DogProfileProvider>
         </AuthProvider>
       </LanguageProvider>

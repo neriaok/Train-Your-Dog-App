@@ -9,9 +9,9 @@ import { useDogProfile } from '../profile/DogProfileContext';
 import { C } from '../data';
 import { styles as authStyles } from './authStyles';
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; onOpenJournal: () => void; }
 
-export default function DogProfileScreen({ onBack }: Props) {
+export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).profile;
   const { profile, saveProfile } = useDogProfile();
@@ -98,6 +98,10 @@ export default function DogProfileScreen({ onBack }: Props) {
           <PressableScale onPress={handleSave} disabled={busy} style={authStyles.submitBtn}>
             <Text style={authStyles.submitText}>{busy ? '...' : t.saveBtn}</Text>
           </PressableScale>
+
+          <PressableScale onPress={onOpenJournal} style={styles.journalBtn}>
+            <Text style={styles.journalBtnText}>{t.journalBtn}</Text>
+          </PressableScale>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -114,4 +118,9 @@ const styles = StyleSheet.create({
   photoPlaceholderEmoji: { fontSize: 40 },
   photoHint: { marginTop: 8, fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange },
   since: { fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft, textAlign: 'center' },
+  journalBtn: {
+    alignItems: 'center', paddingVertical: 12, borderRadius: 14,
+    backgroundColor: C.bg, borderWidth: 1.5, borderColor: C.border,
+  },
+  journalBtnText: { fontSize: 14, fontFamily: 'Heebo_700Bold', color: C.text },
 });
