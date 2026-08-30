@@ -44,6 +44,8 @@ export const STRINGS = {
       signUpSuccess: 'נרשמת בהצלחה! בדוק/י את המייל לאימות, ואז התחבר/י.',
       back: 'חזרה',
       savedAccount: 'חשבון שמור',
+      or: 'או',
+      continueWithGoogle: 'המשך עם Google',
     },
     upgrade: {
       title: 'שדרוג לפרימיום',
@@ -164,6 +166,8 @@ export const STRINGS = {
       signUpSuccess: 'Signed up! Check your email to verify, then sign in.',
       back: 'Back',
       savedAccount: 'Saved account',
+      or: 'or',
+      continueWithGoogle: 'Continue with Google',
     },
     upgrade: {
       title: 'Upgrade to Premium',

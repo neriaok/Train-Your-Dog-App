@@ -34,7 +34,7 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
   const {
     mode, setMode, email, setEmail, password, setPassword,
     setEmailFocused, showSavedAccount,
-    error, notice, busy, submit, handleQuickSignIn,
+    error, notice, busy, submit, handleQuickSignIn, handleGoogleSignIn,
   } = useAuthForm(onAuthed);
 
   const handleSubmit = (e: { preventDefault: () => void }) => {
@@ -135,6 +135,17 @@ export default function AuthScreen({ onBack, onAuthed }: Props) {
 
           {error && <Text style={styles.error}>{error}</Text>}
           {notice === 'signUpSuccess' && <Text style={styles.notice}>{t.signUpSuccess}</Text>}
+
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>{t.or}</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <PressableScale onPress={handleGoogleSignIn} disabled={busy} style={styles.googleBtn}>
+            <Text style={styles.googleIcon}>G</Text>
+            <Text style={styles.googleBtnText}>{t.continueWithGoogle}</Text>
+          </PressableScale>
 
           <PressableScale onPress={() => setMode(mode === 'signIn' ? 'signUp' : 'signIn')} style={styles.switchBtn}>
             <Text style={styles.switchText}>{mode === 'signIn' ? t.switchToSignUp : t.switchToSignIn}</Text>

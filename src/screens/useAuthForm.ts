@@ -12,7 +12,7 @@ export type AuthNotice = 'signUpSuccess' | null;
  * signing in/up actually does.
  */
 export function useAuthForm(onAuthed: () => void) {
-  const { isMock, signIn, signUp, quickSignIn } = useAuth();
+  const { isMock, signIn, signUp, signInWithGoogle, quickSignIn } = useAuth();
 
   const [mode, setMode] = useState<AuthMode>('signIn');
   const [email, setEmail] = useState('');
@@ -29,6 +29,19 @@ export function useAuthForm(onAuthed: () => void) {
     await quickSignIn();
     setBusy(false);
     onAuthed();
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setBusy(true);
+    const result = await signInWithGoogle();
+    // On success the browser is already navigating to Google - only a
+    // failure (e.g. mock mode, or the call rejecting before redirect)
+    // actually reaches this line.
+    if (result.error) {
+      setBusy(false);
+      setError(result.error);
+    }
   };
 
   const submit = async () => {
@@ -55,6 +68,6 @@ export function useAuthForm(onAuthed: () => void) {
   return {
     isMock, mode, setMode, email, setEmail, password, setPassword,
     emailFocused, setEmailFocused, showSavedAccount,
-    error, notice, busy, submit, handleQuickSignIn,
+    error, notice, busy, submit, handleQuickSignIn, handleGoogleSignIn,
   };
 }

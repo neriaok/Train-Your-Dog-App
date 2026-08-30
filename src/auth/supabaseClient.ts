@@ -22,7 +22,11 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured()
         storage: AsyncStorage,
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: false,
+        // Needed on web so the client picks up the session Supabase leaves
+        // in the URL after redirecting back from an OAuth provider (see
+        // AuthContext.signInWithGoogle). A no-op on native, which never
+        // gets a URL fragment to detect.
+        detectSessionInUrl: true,
       },
     })
   : null;

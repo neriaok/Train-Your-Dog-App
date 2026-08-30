@@ -58,6 +58,16 @@ export const styles = StyleSheet.create({
     backgroundColor: C.orange, borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 4,
   },
   submitText: { color: 'white', fontSize: 15, fontFamily: 'Heebo_800ExtraBold' },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 2 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: C.border },
+  dividerText: { fontSize: 11, fontFamily: 'Heebo_500Medium', color: C.soft },
+  googleBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    backgroundColor: 'white', borderRadius: 14, borderWidth: 1.5, borderColor: C.border,
+    paddingVertical: 13,
+  },
+  googleIcon: { fontSize: 15, fontFamily: 'Heebo_800ExtraBold', color: '#4285F4' },
+  googleBtnText: { fontSize: 14, fontFamily: 'Heebo_700Bold', color: C.text },
   switchBtn: { alignItems: 'center', paddingVertical: 6 },
   switchText: { color: C.soft, fontSize: 12, fontFamily: 'Heebo_500Medium' },
 });

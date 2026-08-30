@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Platform } from 'react-native';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { mockLoadState, mockSignUp, mockSignIn, mockQuickSignIn, mockSignOut, mockSetPremium, MOCK_USER_ID } from './mockAuth';
@@ -17,6 +18,8 @@ interface AuthContextValue {
   isPremium: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  /** Real backend only - redirects to Google, then back into the app once signed in. */
+  signInWithGoogle: () => Promise<{ error: string | null }>;
   /** Mock mode only - one tap sign-in as the built-in "Neriaok" demo account, already premium. */
   quickSignIn: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -33,6 +36,7 @@ const AuthContext = createContext<AuthContextValue>({
   isPremium: false,
   signUp: async () => ({ error: null }),
   signIn: async () => ({ error: null }),
+  signInWithGoogle: async () => ({ error: null }),
   quickSignIn: async () => {},
   signOut: async () => {},
   upgradeToPremium: async () => {},
@@ -130,6 +134,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null };
   };
 
+  const signInWithGoogle = async () => {
+    if (isMock) return { error: 'Google sign-in needs the real backend configured first (see backend/supabase/README.md).' };
+    if (!supabase) return { error: 'Accounts are not enabled yet' };
+    // On web this navigates the whole page to Google and back - there is no
+    // further branch to take here on success, the redirect just happens.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: Platform.OS === 'web' ? { redirectTo: window.location.origin } : undefined,
+    });
+    return { error: error?.message ?? null };
+  };
+
   const quickSignIn = async () => {
     if (!isMock) return;
     await mockQuickSignIn();
@@ -168,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ ready, isMock, user, isPremium, signUp, signIn, quickSignIn, signOut, upgradeToPremium, downgradeFromPremium }}
+      value={{ ready, isMock, user, isPremium, signUp, signIn, signInWithGoogle, quickSignIn, signOut, upgradeToPremium, downgradeFromPremium }}
     >
       {children}
     </AuthContext.Provider>

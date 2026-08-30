@@ -1,6 +1,13 @@
 import React, { useRef } from 'react';
 import { Animated, Pressable, StyleProp, ViewStyle, GestureResponderEvent } from 'react-native';
 
+// A single animated element (not Pressable wrapping a separately-styled
+// inner View) so `style` is applied exactly once, on the actual direct
+// parent of `children` - a caller-supplied flexDirection etc. reaches them
+// correctly, and position/size styles (absolute badges, etc.) behave
+// exactly as they would on a plain Pressable.
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 interface Props {
   onPress?: (e: GestureResponderEvent) => void;
   style?: StyleProp<ViewStyle>;
@@ -22,10 +29,14 @@ export default function PressableScale({ onPress, style, disabled, scaleTo = 0.9
   };
 
   return (
-    <Pressable style={style} onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} disabled={disabled}>
-      <Animated.View style={{ transform: [{ scale }] }}>
-        {children}
-      </Animated.View>
-    </Pressable>
+    <AnimatedPressable
+      style={[style, { transform: [{ scale }] }]}
+      onPress={onPress}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      disabled={disabled}
+    >
+      {children}
+    </AnimatedPressable>
   );
 }
