@@ -150,6 +150,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
               onPress={() => (premiumLocked ? onOpenUpgrade() : onSelect(lvl.id))}
               disabled={locked}
               scaleTo={0.98}
+              accessibilityLabel={`${t.levelLabel(lvl.id)} - ${lvl.title}${done ? `, ${t.done}` : ''}${premiumLocked ? `, ${t.premiumBadge}` : ''}`}
               style={[
                 styles.card,
                 done ? { borderColor: lvl.color, borderWidth: 2 } :
@@ -206,16 +207,16 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
       <View pointerEvents="box-none" style={[styles.fabWrap, isRTL ? { left: 16 } : { right: 16 }]}>
         {showTeaser && (
           <Animated.View style={[styles.teaser, { opacity: teaserOpacity, transform: [{ translateY: teaserSlide }] }]}>
-            <PressableScale onPress={dismissTeaser} style={styles.teaserClose}>
+            <PressableScale onPress={dismissTeaser} style={styles.teaserClose} accessibilityLabel={t.closeHint}>
               <Text style={styles.teaserCloseText}>×</Text>
             </PressableScale>
-            <PressableScale onPress={openAgent} style={styles.teaserBody}>
+            <PressableScale onPress={openAgent} style={styles.teaserBody} accessibilityLabel={`${t.agentTitle} - ${t.agentSub}`}>
               <Text style={[styles.teaserTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentTitle}</Text>
               <Text style={[styles.teaserSub, { textAlign: isRTL ? 'right' : 'left' }]}>{t.agentSub}</Text>
             </PressableScale>
           </Animated.View>
         )}
-        <PressableScale onPress={openAgent} scaleTo={0.92} style={styles.fab}>
+        <PressableScale onPress={openAgent} scaleTo={0.92} style={styles.fab} accessibilityLabel={t.openAssistant}>
           <Text style={styles.fabIcon}>🤖</Text>
         </PressableScale>
       </View>

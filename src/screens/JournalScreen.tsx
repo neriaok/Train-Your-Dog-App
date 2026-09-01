@@ -144,6 +144,7 @@ export default function JournalScreen({ onBack }: Props) {
                 <PressableScale
                   onPress={() => setConfirmDeleteId(entry.id)}
                   style={[styles.entryDeleteX, isRTL ? { left: 10 } : { right: 10 }]}
+                  accessibilityLabel={t.delete}
                 >
                   <Text style={styles.entryDeleteXText}>×</Text>
                 </PressableScale>

@@ -30,6 +30,8 @@ export const STRINGS = {
       badgeAllDone: 'כל הרמות!',
       streakBadge: (n: number) => `${n} ימים ברצף!`,
       addDog: 'הוסיפו את הכלב שלכם',
+      closeHint: 'סגור',
+      openAssistant: 'פתחו את עוזר האילוף',
     },
     auth: {
       title: 'החשבון שלי',
@@ -152,6 +154,8 @@ export const STRINGS = {
       badgeAllDone: 'All levels!',
       streakBadge: (n: number) => `${n} day streak!`,
       addDog: 'Add your dog',
+      closeHint: 'Close',
+      openAssistant: 'Open the training assistant',
     },
     auth: {
       title: 'My Account',

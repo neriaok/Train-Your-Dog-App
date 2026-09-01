@@ -14,9 +14,17 @@ interface Props {
   disabled?: boolean;
   scaleTo?: number;
   children: React.ReactNode;
+  /** Required for icon-only buttons (no visible text) - screen readers have
+   * nothing else to announce for them otherwise. */
+  accessibilityLabel?: string;
+  accessibilityRole?: 'button' | 'link' | 'tab' | 'switch' | 'checkbox' | 'radio' | 'none';
+  accessibilityState?: { disabled?: boolean; selected?: boolean; checked?: boolean };
 }
 
-export default function PressableScale({ onPress, style, disabled, scaleTo = 0.96, children }: Props) {
+export default function PressableScale({
+  onPress, style, disabled, scaleTo = 0.96, children,
+  accessibilityLabel, accessibilityRole = 'button', accessibilityState,
+}: Props) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const pressIn = () => {
@@ -35,6 +43,9 @@ export default function PressableScale({ onPress, style, disabled, scaleTo = 0.9
       onPressIn={pressIn}
       onPressOut={pressOut}
       disabled={disabled}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole={accessibilityRole}
+      accessibilityState={accessibilityState ?? { disabled }}
     >
       {children}
     </AnimatedPressable>
