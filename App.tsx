@@ -22,6 +22,7 @@ import { supabase } from './src/auth/supabaseClient';
 import { DogProfileProvider } from './src/profile/DogProfileContext';
 import { JournalProvider } from './src/journal/JournalContext';
 import { loadStreak, recordPractice, StreakState } from './src/progress/streak';
+import { LevelsSkeleton } from './src/components/Skeleton';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -121,7 +122,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
     }).start();
   }, [screen]);
 
-  if (!progressLoaded || !languageReady || !authReady) return null;
+  if (!progressLoaded || !languageReady || !authReady) return <LevelsSkeleton />;
 
   const level = LEVELS.find(l => l.id === levelId)!;
   const step = level?.steps[stepIdx];
@@ -225,7 +226,7 @@ export default function App() {
     if (fontsLoaded) await SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded) return <LevelsSkeleton />;
 
   return (
     <SafeAreaProvider>
