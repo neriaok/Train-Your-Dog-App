@@ -10,6 +10,7 @@ import PressableScale from '../components/PressableScale';
 import { Level, C } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
+import { shareText } from '../utils/share';
 
 interface Props {
   levels: Level[];
@@ -23,6 +24,7 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
   const { language } = useLanguage();
   const t = useStrings(language).success;
   const [confetti, setConfetti] = useState(true);
+  const [shareNotice, setShareNotice] = useState(false);
   const scale = useRef(new Animated.Value(0.85)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const trophyScale = useRef(new Animated.Value(0)).current;
@@ -50,6 +52,14 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
   }, []);
 
   const totalCommands = level.steps.reduce((a, s) => a + s.commands.length, 0);
+
+  const handleShare = async () => {
+    const result = await shareText(t.shareMessage(level.emoji, level.title));
+    if (result === 'copied') {
+      setShareNotice(true);
+      setTimeout(() => setShareNotice(false), 3000);
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: level.colorLight }]}>
@@ -125,6 +135,11 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
               <Text style={[styles.restartText, { color: level.color }]}>{t.restartBtn}</Text>
             </PressableScale>
           </View>
+
+          <PressableScale onPress={handleShare} style={styles.shareBtn}>
+            <Text style={styles.shareText}>{t.shareBtn}</Text>
+          </PressableScale>
+          {shareNotice && <Text style={styles.shareNotice}>{t.shareCopied}</Text>}
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
@@ -182,4 +197,10 @@ const styles = StyleSheet.create({
   },
   btnText: { color: 'white', fontSize: 15, fontFamily: 'Heebo_800ExtraBold' },
   restartText: { fontSize: 15, fontFamily: 'Heebo_800ExtraBold' },
+  shareBtn: { marginTop: 10, paddingVertical: 10, alignItems: 'center', width: '100%' },
+  shareText: { fontSize: 13, fontFamily: 'Heebo_600SemiBold', color: C.soft },
+  shareNotice: {
+    fontSize: 11, fontFamily: 'Heebo_500Medium', color: C.teal,
+    textAlign: 'center', marginTop: 2,
+  },
 });

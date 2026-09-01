@@ -90,6 +90,9 @@ export const STRINGS = {
       allDone: 'השלמתם את כל הרמות! אלופים אמיתיים!',
       nextBtn: (emoji: string) => `הבא ${emoji}`,
       restartBtn: '🔄 שוב',
+      shareBtn: '📤 שתפו את ההישג',
+      shareMessage: (emoji: string, title: string) => `השלמתי את ${emoji} ${title} באפליקציית מאלפים יחד! 🐾`,
+      shareCopied: 'ההודעה הועתקה - הדביקו איפה שתרצו!',
     },
     agent: {
       back: 'חזרה',
@@ -228,6 +231,9 @@ export const STRINGS = {
       allDone: "You've completed every level! True champions!",
       nextBtn: (emoji: string) => `Next ${emoji}`,
       restartBtn: '🔄 Again',
+      shareBtn: '📤 Share your achievement',
+      shareMessage: (emoji: string, title: string) => `I just completed ${emoji} ${title} on the Train Your Dog app! 🐾`,
+      shareCopied: 'Message copied - paste it anywhere you like!',
     },
     agent: {
       back: 'Back',
