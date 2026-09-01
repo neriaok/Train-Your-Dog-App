@@ -9,7 +9,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useAuth } from '../auth/AuthContext';
 import { useDogProfile } from '../profile/DogProfileContext';
-import { StreakState } from '../progress/streak';
+import { StreakState, WEEKLY_GOAL } from '../progress/streak';
 
 interface Props {
   levels: Level[];
@@ -71,6 +71,9 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
   if (levels.length > 0 && completed.length === levels.length) {
     badges.push({ key: 'alldone', emoji: '🏆', label: t.badgeAllDone, color: C.purple });
   }
+  if (streak.weeklyGoalMet) {
+    badges.push({ key: 'weekly', emoji: '🎯', label: t.weeklyBadge, color: C.teal });
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -123,6 +126,23 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
             <Text style={styles.reminderText}>{t.streakReminder}</Text>
           </View>
         )}
+
+        <View style={[styles.weeklyCard, streak.weeklyGoalMet && { borderColor: C.teal + '60', backgroundColor: C.tealL }]}>
+          <View style={[styles.weeklyHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <Text style={styles.weeklyTitle}>🎯 {t.weeklyChallengeTitle}</Text>
+            <View style={[styles.weeklyDots, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              {Array.from({ length: WEEKLY_GOAL }).map((_, i) => (
+                <View
+                  key={i}
+                  style={[styles.weeklyDot, i < streak.weeklyCount && { backgroundColor: C.teal, borderColor: C.teal }]}
+                />
+              ))}
+            </View>
+          </View>
+          <Text style={[styles.weeklyText, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {streak.weeklyGoalMet ? t.weeklyChallengeDone : t.weeklyChallengeProgress(streak.weeklyCount, WEEKLY_GOAL)}
+          </Text>
+        </View>
 
         {badges.length > 0 && (
           <ScrollView
@@ -259,6 +279,18 @@ const styles = StyleSheet.create({
     borderRadius: 14, padding: 12, marginBottom: 16,
   },
   reminderText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange, textAlign: 'center' },
+  weeklyCard: {
+    backgroundColor: C.white, borderRadius: 16, padding: 14, marginBottom: 16,
+    borderWidth: 1.5, borderColor: C.border,
+  },
+  weeklyHeader: { alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
+  weeklyTitle: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
+  weeklyDots: { gap: 6 },
+  weeklyDot: {
+    width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: C.border,
+    backgroundColor: C.bg,
+  },
+  weeklyText: { fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft },
   badgesRow: { marginBottom: 16 },
   badgesRowContent: { gap: 8, paddingRight: 2 },
   badgeChip: {

@@ -43,7 +43,9 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const [progressLoaded, setProgressLoaded] = useState(false);
   const hasLoadedProgress = useRef(false);
   const screenFade = useRef(new Animated.Value(1)).current;
-  const [streak, setStreak] = useState<StreakState>({ streak: 0, lastActiveDate: null, practicedToday: false });
+  const [streak, setStreak] = useState<StreakState>({
+    streak: 0, lastActiveDate: null, practicedToday: false, weeklyCount: 0, weeklyGoalMet: false,
+  });
 
   useEffect(() => {
     setProgressLoaded(false);

@@ -32,6 +32,10 @@ export const STRINGS = {
       addDog: 'הוסיפו את הכלב שלכם',
       closeHint: 'סגור',
       openAssistant: 'פתחו את עוזר האילוף',
+      weeklyChallengeTitle: 'אתגר השבוע',
+      weeklyChallengeProgress: (done: number, goal: number) => `${done} מתוך ${goal} ימי אימון השבוע`,
+      weeklyChallengeDone: 'השלמתם את אתגר השבוע! 🎉',
+      weeklyBadge: 'אתגר השבוע הושלם!',
     },
     auth: {
       title: 'החשבון שלי',
@@ -156,6 +160,10 @@ export const STRINGS = {
       addDog: 'Add your dog',
       closeHint: 'Close',
       openAssistant: 'Open the training assistant',
+      weeklyChallengeTitle: 'Weekly Challenge',
+      weeklyChallengeProgress: (done: number, goal: number) => `${done} of ${goal} training days this week`,
+      weeklyChallengeDone: 'Weekly challenge complete! 🎉',
+      weeklyBadge: 'Weekly challenge done!',
     },
     auth: {
       title: 'My Account',
