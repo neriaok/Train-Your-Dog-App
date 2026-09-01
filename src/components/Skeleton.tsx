@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, View, StyleProp, ViewStyle, StyleSheet } from 'react-native';
-import { C } from '../data';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 /** A single pulsing placeholder box - the building block for loading screens. */
 export function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const opacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
@@ -24,6 +26,8 @@ export function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
  * so the app never shows a blank flash between "app launched" and "we know
  * who's signed in and what they've completed". */
 export function LevelsSkeleton() {
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   return (
     <View style={styles.screen}>
       <View style={styles.topRow}>
@@ -47,7 +51,7 @@ export function LevelsSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   box: { backgroundColor: C.border, borderRadius: 10 },
   screen: { flex: 1, backgroundColor: C.bg, padding: 20, paddingTop: 24 },
   topRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginBottom: 20 },

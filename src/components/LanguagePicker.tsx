@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 import PressableScale from './PressableScale';
 import { useLanguage, AVAILABLE_LANGUAGES } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
-import { C } from '../data';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 export default function LanguagePicker() {
   const { language, setLanguage, isRTL } = useLanguage();
   const strings = useStrings(language);
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const [open, setOpen] = useState(false);
   const current = AVAILABLE_LANGUAGES.find(l => l.code === language) ?? AVAILABLE_LANGUAGES[0];
 
@@ -39,9 +41,9 @@ export default function LanguagePicker() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   button: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
   },
   buttonText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
@@ -50,7 +52,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', padding: 24,
   },
   sheet: {
-    backgroundColor: 'white', borderRadius: 22, padding: 10,
+    backgroundColor: C.white, borderRadius: 22, padding: 10,
     width: '100%', maxWidth: 320,
   },
   sheetTitle: {

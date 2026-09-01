@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
   Animated, StyleSheet
@@ -7,9 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import ProgressBar from '../components/ProgressBar';
 import PressableScale from '../components/PressableScale';
-import { Level, Step, C } from '../data';
+import { Level, Step } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 interface Props {
   level: Level;
@@ -43,10 +44,10 @@ function CmdBadge({ cmd, delay, visible, color }: {
 
   return (
     <Animated.View style={[
-      styles.badge,
+      cmdBadgeStyles.badge,
       { backgroundColor: color, transform: [{ scale }], opacity },
     ]}>
-      <Text style={styles.badgeText}>{cmd}</Text>
+      <Text style={cmdBadgeStyles.badgeText}>{cmd}</Text>
     </Animated.View>
   );
 }
@@ -54,11 +55,17 @@ function CmdBadge({ cmd, delay, visible, color }: {
 export default function StepScreen({ level, step, stepIdx, totalSteps, onComplete, onBack }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).step;
+  const { theme, colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const [cmdsVisible, setCmdsVisible] = useState(false);
   const [done, setDone] = useState(false);
 
   const accents = [level.color, '#9B5DE5', '#2EC4B6'];
-  const accentLights = [level.colorLight, '#F3EDFF', '#E8FAF9'];
+  // Pale "light" tints only read as pale on a light background - on dark,
+  // fall back to a low-alpha wash of the accent itself instead.
+  const accentLights = theme === 'dark'
+    ? [level.color + '30', '#9B5DE530', '#2EC4B630']
+    : [level.colorLight, '#F3EDFF', '#E8FAF9'];
   const accent = accents[stepIdx % 3];
   const accentL = accentLights[stepIdx % 3];
 
@@ -123,10 +130,10 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
         </View>
 
         {/* Tip */}
-        <View style={styles.tipCard}>
+        <View style={[styles.tipCard, theme === 'dark' && { backgroundColor: '#3D3115', borderColor: '#FFD16640' }]}>
           <Text style={{ fontSize: 22 }}>💡</Text>
           <View style={{ flex: 1 }}>
-            <Text style={styles.tipTitle}>{t.tipLabel}</Text>
+            <Text style={[styles.tipTitle, theme === 'dark' && { color: '#FFD166' }]}>{t.tipLabel}</Text>
             <Text style={styles.tipText}>{step.tip}</Text>
           </View>
         </View>
@@ -149,7 +156,7 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   header: { paddingHorizontal: 20, paddingTop: 16 },
   headerRow: {
@@ -157,13 +164,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', marginBottom: 14,
   },
   backBtn: {
-    backgroundColor: 'white', borderWidth: 1.5,
+    backgroundColor: C.white, borderWidth: 1.5,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
   },
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold' },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   levelBadge: {
-    backgroundColor: 'white', borderWidth: 1.5,
+    backgroundColor: C.white, borderWidth: 1.5,
     borderRadius: 12, paddingHorizontal: 12, paddingVertical: 5,
   },
   levelBadgeText: { fontSize: 12, fontFamily: 'Heebo_700Bold' },
@@ -189,11 +196,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Heebo_500Medium',
   },
   cmdsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
-  badge: {
-    paddingHorizontal: 18, paddingVertical: 7,
-    borderRadius: 40,
-  },
-  badgeText: { color: 'white', fontSize: 20, fontFamily: 'Heebo_700Bold' },
   tipCard: {
     backgroundColor: '#FFF9E6', borderWidth: 1.5, borderColor: '#FFD16660',
     borderRadius: 18, padding: 14, flexDirection: 'row', gap: 10, alignItems: 'flex-start',
@@ -206,4 +208,12 @@ const styles = StyleSheet.create({
     shadowRadius: 12, elevation: 6,
   },
   doneBtnText: { color: 'white', fontSize: 17, fontFamily: 'Heebo_800ExtraBold' },
+});
+
+const cmdBadgeStyles = StyleSheet.create({
+  badge: {
+    paddingHorizontal: 18, paddingVertical: 7,
+    borderRadius: 40,
+  },
+  badgeText: { color: 'white', fontSize: 20, fontFamily: 'Heebo_700Bold' },
 });

@@ -1,13 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import PressableScale from '../components/PressableScale';
 import LanguagePicker from '../components/LanguagePicker';
-import { C } from '../data';
+import ThemeToggle from '../components/ThemeToggle';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useAuth } from '../auth/AuthContext';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 interface Props { onStart: () => void; onOpenAuth: () => void }
 
@@ -16,6 +17,8 @@ export default function SplashScreen({ onStart, onOpenAuth }: Props) {
   const t = useStrings(language).splash;
   const tLevels = useStrings(language).levels;
   const { user, isPremium, signOut } = useAuth();
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(30)).current;
 
@@ -40,6 +43,7 @@ export default function SplashScreen({ onStart, onOpenAuth }: Props) {
             <Text style={styles.accountBtnText}>{tLevels.signIn}</Text>
           </PressableScale>
         )}
+        <ThemeToggle />
         <LanguagePicker />
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -72,11 +76,11 @@ export default function SplashScreen({ onStart, onOpenAuth }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   topRow: { flexDirection: 'row', paddingHorizontal: 20, paddingTop: 12, gap: 8, alignItems: 'center' },
   accountBtn: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6, maxWidth: 220,
   },
   accountBtnText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.text },

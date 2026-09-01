@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View, Text, ScrollView,
   Animated, StyleSheet
@@ -7,10 +7,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DogScene from '../components/DogScene';
 import Confetti from '../components/Confetti';
 import PressableScale from '../components/PressableScale';
-import { Level, C } from '../data';
+import { Level } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { shareText } from '../utils/share';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 interface Props {
   levels: Level[];
@@ -23,6 +24,8 @@ interface Props {
 export default function SuccessScreen({ levels, level, isLast, onNext, onRestart }: Props) {
   const { language } = useLanguage();
   const t = useStrings(language).success;
+  const { theme, colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const [confetti, setConfetti] = useState(true);
   const [shareNotice, setShareNotice] = useState(false);
   const scale = useRef(new Animated.Value(0.85)).current;
@@ -62,7 +65,7 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: level.colorLight }]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme === 'dark' ? C.bg : level.colorLight }]}>
       <Confetti active={confetti} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.card, { opacity, transform: [{ scale }] }]}>
@@ -105,15 +108,15 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
           {/* Next level or completion */}
           {nextLevel && !isLast ? (
             <View style={[styles.nextCard, {
-              backgroundColor: nextLevel.colorLight,
-              borderColor: nextLevel.colorMid,
+              backgroundColor: theme === 'dark' ? nextLevel.color + '25' : nextLevel.colorLight,
+              borderColor: theme === 'dark' ? nextLevel.color + '60' : nextLevel.colorMid,
             }]}>
               <Text style={[styles.nextText, { color: nextLevel.color }]}>
                 {t.next(nextLevel.emoji, nextLevel.id, nextLevel.title)}
               </Text>
             </View>
           ) : (
-            <View style={styles.doneCard}>
+            <View style={[styles.doneCard, theme === 'dark' && { backgroundColor: '#0F3D3040' }]}>
               <Text style={styles.doneText}>{t.allDone}</Text>
             </View>
           )}
@@ -146,7 +149,7 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1 },
   scroll: { padding: 24, paddingTop: 32, alignItems: 'center' },
   card: {

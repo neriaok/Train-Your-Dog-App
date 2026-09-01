@@ -1,19 +1,19 @@
 import { StyleSheet } from 'react-native';
-import { C } from '../data';
+import { Colors } from '../theme/ThemeContext';
 
 // Shared by AuthScreen.tsx (native) and AuthScreen.web.tsx (web) - kept in
 // its own module so neither of the two platform-specific files needs to
 // import the other. Importing "./AuthScreen" from AuthScreen.web.tsx would
 // resolve back to itself under Metro's web platform resolution (a require
 // cycle that leaves `styles` undefined at import time).
-export const styles = StyleSheet.create({
+export const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 10,
   },
   backBtn: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
   },
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
   fieldWrap: { position: 'relative', zIndex: 20 },
   suggestionDropdown: {
     position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 3,
-    backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: C.border,
+    backgroundColor: C.white, borderRadius: 8, borderWidth: 1, borderColor: C.border,
     overflow: 'hidden',
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1, shadowRadius: 6, elevation: 4,
@@ -63,7 +63,7 @@ export const styles = StyleSheet.create({
   dividerText: { fontSize: 11, fontFamily: 'Heebo_500Medium', color: C.soft },
   googleBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-    backgroundColor: 'white', borderRadius: 14, borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderRadius: 14, borderWidth: 1.5, borderColor: C.border,
     paddingVertical: 13,
   },
   googleIcon: { fontSize: 15, fontFamily: 'Heebo_800ExtraBold', color: '#4285F4' },

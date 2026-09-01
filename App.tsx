@@ -23,6 +23,7 @@ import { DogProfileProvider } from './src/profile/DogProfileContext';
 import { JournalProvider } from './src/journal/JournalContext';
 import { loadStreak, recordPractice, StreakState } from './src/progress/streak';
 import { LevelsSkeleton } from './src/components/Skeleton';
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +35,7 @@ const CURRENT_POSITION_KEY = 'dogTrainingApp:currentPosition';
 function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const { isRTL, ready: languageReady } = useLanguage();
   const { ready: authReady, isPremium, isMock, user } = useAuth();
+  const { theme } = useTheme();
   const LEVELS = useLevels();
 
   const [screen, setScreen] = useState<Screen>('splash');
@@ -169,7 +171,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
 
   return (
     <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
-      <StatusBar style="dark" />
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       <Animated.View
         style={{
           flex: 1,
@@ -230,15 +232,17 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <DogProfileProvider>
-            <JournalProvider>
-              <AppInner onLayoutRootView={onLayoutRootView} />
-            </JournalProvider>
-          </DogProfileProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <DogProfileProvider>
+              <JournalProvider>
+                <AppInner onLayoutRootView={onLayoutRootView} />
+              </JournalProvider>
+            </DogProfileProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, Linking, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableScale from '../components/PressableScale';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
-import { C } from '../data';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 /**
  * Fill this in with your deployed backend/payments-worker URL to let this
@@ -28,6 +28,8 @@ export default function UpgradeScreen({ onBack, onSignInRequired }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).upgrade;
   const { user, isMock, isPremium, upgradeToPremium, downgradeFromPremium } = useAuth();
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -115,11 +117,11 @@ export default function UpgradeScreen({ onBack, onSignInRequired }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.purpleL },
   header: { paddingHorizontal: 20, paddingTop: 12 },
   backBtn: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6, alignSelf: 'flex-start',
   },
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },

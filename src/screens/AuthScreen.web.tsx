@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { unstable_createElement } from 'react-native-web';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableScale from '../components/PressableScale';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
-import { C } from '../data';
+import { useTheme } from '../theme/ThemeContext';
 import { BUILT_IN_ACCOUNT_DISPLAY } from '../auth/mockAuth';
 import { useAuthForm } from './useAuthForm';
-import { styles } from './authStyles';
+import { makeStyles } from './authStyles';
 
 interface Props { onBack: () => void; onAuthed: () => void; }
 
@@ -31,6 +31,8 @@ interface Props { onBack: () => void; onAuthed: () => void; }
 export default function AuthScreen({ onBack, onAuthed }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).auth;
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const {
     mode, setMode, email, setEmail, password, setPassword,
     setEmailFocused, showSavedAccount,

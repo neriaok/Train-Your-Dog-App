@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 interface Props {
   value: number;
@@ -12,6 +13,8 @@ interface Props {
 export default function ProgressBar({ value, total, color }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).levels;
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const pct = Math.round((value / total) * 100);
   const widthAnim = useRef(new Animated.Value(0)).current;
 
@@ -42,10 +45,10 @@ export default function ProgressBar({ value, total, color }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   container: { marginBottom: 8 },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  label: { fontSize: 13, color: '#6B7280', fontFamily: 'Heebo_500Medium' },
+  label: { fontSize: 13, color: C.soft, fontFamily: 'Heebo_500Medium' },
   pct: { fontSize: 13, fontFamily: 'Heebo_700Bold' },
   track: { borderRadius: 20, height: 10, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 20 },

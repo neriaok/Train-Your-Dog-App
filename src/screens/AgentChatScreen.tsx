@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, TextInput, ScrollView, Animated,
   KeyboardAvoidingView, Platform, StyleSheet,
@@ -7,9 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableScale from '../components/PressableScale';
 import { runAgent } from '../agent/runAgent';
 import { AgentMessage } from '../agent/types';
-import { Level, C } from '../data';
+import { Level } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 interface Props { levels: Level[]; onBack: () => void; }
 
@@ -24,6 +25,8 @@ type ChatEntry =
 export default function AgentChatScreen({ levels, onBack }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).agent;
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const [input, setInput] = useState('');
   const [entries, setEntries] = useState<ChatEntry[]>([
     { id: 'intro', kind: 'agent', text: t.intro },
@@ -118,6 +121,8 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
 }
 
 function TypingBubble() {
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const dots = [useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current];
 
   useEffect(() => {
@@ -149,14 +154,14 @@ function TypingBubble() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 10,
   },
   backBtn: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
   },
   backText: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.text },
@@ -170,7 +175,7 @@ const styles = StyleSheet.create({
   userText: { color: 'white', fontSize: 14, fontFamily: 'Heebo_600SemiBold' },
   agentRow: { alignItems: 'flex-start' },
   agentBubble: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 18, borderBottomStartRadius: 4,
     paddingHorizontal: 16, paddingVertical: 10, maxWidth: '85%',
   },
@@ -182,7 +187,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: C.border, backgroundColor: C.bg,
   },
   input: {
-    flex: 1, backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    flex: 1, backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 16, paddingHorizontal: 16, paddingVertical: 10,
     fontSize: 14, fontFamily: 'Heebo_400Regular', color: C.text,
   },

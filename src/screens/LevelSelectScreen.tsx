@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Image, ScrollView, Animated, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProgressBar from '../components/ProgressBar';
 import PressableScale from '../components/PressableScale';
 import LanguagePicker from '../components/LanguagePicker';
-import { Level, C } from '../data';
+import ThemeToggle from '../components/ThemeToggle';
+import { Level } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useAuth } from '../auth/AuthContext';
 import { useDogProfile } from '../profile/DogProfileContext';
 import { StreakState, WEEKLY_GOAL } from '../progress/streak';
+import { useTheme, Colors } from '../theme/ThemeContext';
 
 interface Props {
   levels: Level[];
@@ -27,6 +29,8 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
   const t = useStrings(language).levels;
   const { user, isPremium, signOut } = useAuth();
   const { profile } = useDogProfile();
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(-16)).current;
   const [showTeaser, setShowTeaser] = useState(false);
@@ -107,6 +111,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
               )}
             </PressableScale>
           )}
+          <ThemeToggle />
           <LanguagePicker />
         </View>
 
@@ -188,7 +193,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
               style={[
                 styles.card,
                 done ? { borderColor: lvl.color, borderWidth: 2 } :
-                  locked ? { borderColor: C.border, borderWidth: 2, backgroundColor: '#F9F9F9' } :
+                  locked ? { borderColor: C.border, borderWidth: 2, backgroundColor: C.bg } :
                     premiumLocked ? { borderColor: C.purple + '40', borderWidth: 2 } :
                       { borderColor: lvl.color + '40', borderWidth: 2 },
               ]}
@@ -258,12 +263,12 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
   scroll: { padding: 20, paddingTop: 20 },
   topRow: { flexDirection: 'row', marginBottom: 12, gap: 8, alignItems: 'center' },
   accountBtn: {
-    backgroundColor: 'white', borderWidth: 1.5, borderColor: C.border,
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6, maxWidth: 220,
   },
   accountBtnText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.text },

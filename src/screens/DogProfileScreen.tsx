@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TextInput, ScrollView, Image, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -6,12 +6,12 @@ import PressableScale from '../components/PressableScale';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useDogProfile, AgeGroup, Experience } from '../profile/DogProfileContext';
-import { C } from '../data';
-import { styles as authStyles } from './authStyles';
+import { useTheme, Colors } from '../theme/ThemeContext';
+import { makeStyles as makeAuthStyles } from './authStyles';
 
 interface Props { onBack: () => void; onOpenJournal: () => void; }
 
-function Chip<T extends string>({ value, selected, label, onPress }: { value: T; selected: boolean; label: string; onPress: (v: T) => void }) {
+function Chip<T extends string>({ value, selected, label, onPress, styles }: { value: T; selected: boolean; label: string; onPress: (v: T) => void; styles: ReturnType<typeof makeStyles> }) {
   return (
     <PressableScale onPress={() => onPress(value)} style={[styles.chip, selected && styles.chipActive]}>
       <Text style={[styles.chipText, selected && styles.chipTextActive]}>{label}</Text>
@@ -23,6 +23,9 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).profile;
   const { profile, saveProfile } = useDogProfile();
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const authStyles = useMemo(() => makeAuthStyles(C), [C]);
 
   const [name, setName] = useState(profile?.name ?? '');
   const [breed, setBreed] = useState(profile?.breed ?? '');
@@ -105,17 +108,17 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
           <View>
             <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>{t.ageGroupLabel}</Text>
             <View style={[styles.chipRow, rowDir]}>
-              <Chip value="puppy" selected={ageGroup === 'puppy'} label={t.ageGroupPuppy} onPress={setAgeGroup} />
-              <Chip value="adult" selected={ageGroup === 'adult'} label={t.ageGroupAdult} onPress={setAgeGroup} />
-              <Chip value="senior" selected={ageGroup === 'senior'} label={t.ageGroupSenior} onPress={setAgeGroup} />
+              <Chip value="puppy" selected={ageGroup === 'puppy'} label={t.ageGroupPuppy} onPress={setAgeGroup} styles={styles} />
+              <Chip value="adult" selected={ageGroup === 'adult'} label={t.ageGroupAdult} onPress={setAgeGroup} styles={styles} />
+              <Chip value="senior" selected={ageGroup === 'senior'} label={t.ageGroupSenior} onPress={setAgeGroup} styles={styles} />
             </View>
           </View>
 
           <View>
             <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>{t.experienceLabel}</Text>
             <View style={[styles.chipRow, rowDir]}>
-              <Chip value="beginner" selected={experience === 'beginner'} label={t.experienceBeginner} onPress={setExperience} />
-              <Chip value="experienced" selected={experience === 'experienced'} label={t.experienceExperienced} onPress={setExperience} />
+              <Chip value="beginner" selected={experience === 'beginner'} label={t.experienceBeginner} onPress={setExperience} styles={styles} />
+              <Chip value="experienced" selected={experience === 'experienced'} label={t.experienceExperienced} onPress={setExperience} styles={styles} />
             </View>
           </View>
 
@@ -137,7 +140,7 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   photoWrap: { alignItems: 'center', marginBottom: 4 },
   photo: { width: 96, height: 96, borderRadius: 48 },
   photoPlaceholder: {

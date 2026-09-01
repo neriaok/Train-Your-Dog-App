@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TextInput, ScrollView, Image, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -6,8 +6,8 @@ import PressableScale from '../components/PressableScale';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useJournal, JournalEntry } from '../journal/JournalContext';
-import { C } from '../data';
-import { styles as authStyles } from './authStyles';
+import { useTheme, Colors } from '../theme/ThemeContext';
+import { makeStyles as makeAuthStyles } from './authStyles';
 
 interface Props { onBack: () => void; }
 
@@ -15,6 +15,9 @@ export default function JournalScreen({ onBack }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).journal;
   const { entries, addEntry, removeEntry } = useJournal();
+  const { colors: C } = useTheme();
+  const styles = useMemo(() => makeStyles(C), [C]);
+  const authStyles = useMemo(() => makeAuthStyles(C), [C]);
 
   const [mediaUri, setMediaUri] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'photo' | 'video' | null>(null);
@@ -157,7 +160,7 @@ export default function JournalScreen({ onBack }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C: Colors) => StyleSheet.create({
   mediaPicker: { alignItems: 'center', marginBottom: 4 },
   mediaPreview: { width: 96, height: 96, borderRadius: 16 },
   mediaPlaceholder: {
