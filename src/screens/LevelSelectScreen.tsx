@@ -59,6 +59,14 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
 
   const openAgent = () => { dismissTeaser(); onOpenAgent(); };
 
+  // Personalized nudge from the profile's optional age/experience answers -
+  // most specific first, since a puppy or senior tip matters more here than
+  // a generic beginner one even if both would technically apply.
+  const personalizedTip = !user ? null :
+    profile?.ageGroup === 'puppy' ? t.tipPuppy :
+      profile?.ageGroup === 'senior' ? t.tipSenior :
+        profile?.experience === 'beginner' ? t.tipBeginner : null;
+
   const badges: { key: string; emoji: string; label: string; color: string }[] = [];
   levels.forEach(lvl => {
     if (completed.includes(lvl.id)) {
@@ -124,6 +132,12 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
         {streak.streak > 0 && !streak.practicedToday && (
           <View style={styles.reminderBanner}>
             <Text style={styles.reminderText}>{t.streakReminder}</Text>
+          </View>
+        )}
+
+        {personalizedTip && (
+          <View style={styles.personalTip}>
+            <Text style={[styles.personalTipText, { textAlign: isRTL ? 'right' : 'left' }]}>💡 {personalizedTip}</Text>
           </View>
         )}
 
@@ -279,6 +293,11 @@ const styles = StyleSheet.create({
     borderRadius: 14, padding: 12, marginBottom: 16,
   },
   reminderText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange, textAlign: 'center' },
+  personalTip: {
+    backgroundColor: C.purpleL, borderWidth: 1.5, borderColor: C.purple + '30',
+    borderRadius: 14, padding: 12, marginBottom: 16,
+  },
+  personalTipText: { fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.purple, lineHeight: 18 },
   weeklyCard: {
     backgroundColor: C.white, borderRadius: 16, padding: 14, marginBottom: 16,
     borderWidth: 1.5, borderColor: C.border,

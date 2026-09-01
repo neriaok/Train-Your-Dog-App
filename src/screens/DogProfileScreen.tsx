@@ -5,11 +5,19 @@ import * as ImagePicker from 'expo-image-picker';
 import PressableScale from '../components/PressableScale';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
-import { useDogProfile } from '../profile/DogProfileContext';
+import { useDogProfile, AgeGroup, Experience } from '../profile/DogProfileContext';
 import { C } from '../data';
 import { styles as authStyles } from './authStyles';
 
 interface Props { onBack: () => void; onOpenJournal: () => void; }
+
+function Chip<T extends string>({ value, selected, label, onPress }: { value: T; selected: boolean; label: string; onPress: (v: T) => void }) {
+  return (
+    <PressableScale onPress={() => onPress(value)} style={[styles.chip, selected && styles.chipActive]}>
+      <Text style={[styles.chipText, selected && styles.chipTextActive]}>{label}</Text>
+    </PressableScale>
+  );
+}
 
 export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const { language, isRTL } = useLanguage();
@@ -19,6 +27,8 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const [name, setName] = useState(profile?.name ?? '');
   const [breed, setBreed] = useState(profile?.breed ?? '');
   const [photoUri, setPhotoUri] = useState<string | null>(profile?.photoUri ?? null);
+  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(profile?.ageGroup ?? null);
+  const [experience, setExperience] = useState<Experience | null>(profile?.experience ?? null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -45,13 +55,15 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
     setError(null);
     setBusy(true);
     try {
-      await saveProfile({ name: trimmed, breed: breed.trim(), photoUri });
+      await saveProfile({ name: trimmed, breed: breed.trim(), photoUri, ageGroup, experience });
       onBack();
     } catch {
       setBusy(false);
       setError(t.saveFailed);
     }
   };
+
+  const rowDir = { flexDirection: isRTL ? 'row-reverse' as const : 'row' as const };
 
   return (
     <SafeAreaView style={authStyles.safe}>
@@ -90,6 +102,23 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
             placeholderTextColor={C.soft}
           />
 
+          <View>
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>{t.ageGroupLabel}</Text>
+            <View style={[styles.chipRow, rowDir]}>
+              <Chip value="puppy" selected={ageGroup === 'puppy'} label={t.ageGroupPuppy} onPress={setAgeGroup} />
+              <Chip value="adult" selected={ageGroup === 'adult'} label={t.ageGroupAdult} onPress={setAgeGroup} />
+              <Chip value="senior" selected={ageGroup === 'senior'} label={t.ageGroupSenior} onPress={setAgeGroup} />
+            </View>
+          </View>
+
+          <View>
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>{t.experienceLabel}</Text>
+            <View style={[styles.chipRow, rowDir]}>
+              <Chip value="beginner" selected={experience === 'beginner'} label={t.experienceBeginner} onPress={setExperience} />
+              <Chip value="experienced" selected={experience === 'experienced'} label={t.experienceExperienced} onPress={setExperience} />
+            </View>
+          </View>
+
           {profile?.startDate && (
             <Text style={styles.since}>{t.since(profile.startDate)}</Text>
           )}
@@ -118,6 +147,15 @@ const styles = StyleSheet.create({
   photoPlaceholderEmoji: { fontSize: 40 },
   photoHint: { marginTop: 8, fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange },
   since: { fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft, textAlign: 'center' },
+  fieldLabel: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.soft, marginBottom: 6 },
+  chipRow: { flexWrap: 'wrap', gap: 8 },
+  chip: {
+    borderWidth: 1.5, borderColor: C.border, borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 8, backgroundColor: C.white,
+  },
+  chipActive: { backgroundColor: C.orange, borderColor: C.orange },
+  chipText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.text },
+  chipTextActive: { color: 'white' },
   journalBtn: {
     alignItems: 'center', paddingVertical: 12, borderRadius: 14,
     backgroundColor: C.bg, borderWidth: 1.5, borderColor: C.border,
