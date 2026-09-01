@@ -32,7 +32,12 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
     level.id === 2 ? 'crate_full' :
       level.id === 3 ? 'leave_walk' :
         level.id === 4 ? 'walk_stay' :
-          level.id === 5 ? 'trick_spin' : 'sit';
+          level.id === 5 ? 'trick_spin' :
+            level.id === 6 ? 'stay2_come' :
+              level.id === 7 ? 'recall2_down' :
+                level.id === 8 ? 'social_dance' :
+                  level.id === 9 ? 'field_go' :
+                    level.id === 10 ? 'combo_sit' : 'sit';
 
   useEffect(() => {
     Animated.parallel([

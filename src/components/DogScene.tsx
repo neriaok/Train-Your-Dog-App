@@ -13,6 +13,11 @@ const collarColors: Record<IllustrationKey, string> = {
   leave_close: '#9B5DE5', leave_back: '#9B5DE5', leave_walk: '#9B5DE5',
   walk_pull: '#06D6A0', walk_sit: '#06D6A0', walk_stay: '#06D6A0',
   trick_paw: '#E8A317', trick_high5: '#E8A317', trick_spin: '#E8A317',
+  stay2_sit: '#EF476F', stay2_wait: '#EF476F', stay2_come: '#EF476F',
+  recall2_come: '#118AB2', recall2_sit: '#118AB2', recall2_down: '#118AB2',
+  social_wave: '#FF9F1C', social_kiss: '#FF9F1C', social_dance: '#FF9F1C',
+  field_heel: '#6A4C93', field_stop: '#6A4C93', field_go: '#6A4C93',
+  combo_down: '#073B4C', combo_come: '#073B4C', combo_sit: '#073B4C',
 };
 
 const bubbleTexts: Record<Language, Record<IllustrationKey, string>> = {
@@ -22,6 +27,11 @@ const bubbleTexts: Record<Language, Record<IllustrationKey, string>> = {
     leave_close: 'עזוב!', leave_back: 'עזוב!', leave_walk: 'עזוב!',
     walk_pull: 'לידי!', walk_sit: 'שב!', walk_stay: 'הישאר!',
     trick_paw: 'תן כף!', trick_high5: 'גבוה!', trick_spin: 'הסתובב!',
+    stay2_sit: 'שב!', stay2_wait: 'המתן!', stay2_come: 'בוא!',
+    recall2_come: 'בוא!', recall2_sit: 'שב!', recall2_down: 'ארצה!',
+    social_wave: 'נופף!', social_kiss: 'נשק!', social_dance: 'רקוד!',
+    field_heel: 'לידי!', field_stop: 'עצור!', field_go: 'קדימה!',
+    combo_down: 'ארצה!', combo_come: 'בוא!', combo_sit: 'שב!',
   },
   en: {
     sit: 'Sit!', come: 'Come!', down: 'Down!',
@@ -29,6 +39,11 @@ const bubbleTexts: Record<Language, Record<IllustrationKey, string>> = {
     leave_close: 'Leave it!', leave_back: 'Leave it!', leave_walk: 'Leave it!',
     walk_pull: 'Heel!', walk_sit: 'Sit!', walk_stay: 'Stay!',
     trick_paw: 'Paw!', trick_high5: 'High five!', trick_spin: 'Spin!',
+    stay2_sit: 'Sit!', stay2_wait: 'Wait!', stay2_come: 'Come!',
+    recall2_come: 'Come!', recall2_sit: 'Sit!', recall2_down: 'Down!',
+    social_wave: 'Wave!', social_kiss: 'Kiss!', social_dance: 'Dance!',
+    field_heel: 'Heel!', field_stop: 'Stop!', field_go: 'Go!',
+    combo_down: 'Down!', combo_come: 'Come!', combo_sit: 'Sit!',
   },
 };
 
@@ -528,32 +543,32 @@ function Human({ pose }: { pose: string }) {
       <Ellipse cx="253" cy="199" rx="8" ry="4" fill="#1A1A2E" />
       <Rect x="231" y="103" width="31" height="51" rx="9" fill={isBack ? '#E85A24' : '#FF6B35'} />
       <Rect x="231" y="103" width="31" height="12" rx="9" fill={isBack ? '#D04E1A' : '#E85A24'} />
-      {(pose === 'sit' || pose === 'trick_spin') && (
+      {(pose === 'sit' || pose === 'trick_spin' || pose === 'stay2_sit' || pose === 'recall2_sit' || pose === 'combo_sit' || pose === 'social_dance') && (
         <G>
           <Rect x="220" y="108" width="16" height="8" rx="4" fill="#E8956A" rotation="55" originX="231" originY="112" />
           <Circle cx="212" cy="136" r="6" fill="#E8956A" />
           <Rect x="209" y="129" width="7" height="6" rx="2" fill="#FFD166" />
         </G>
       )}
-      {pose === 'trick_paw' && (
+      {(pose === 'trick_paw' || pose === 'social_wave') && (
         <G>
           <Rect x="205" y="140" width="26" height="8" rx="4" fill="#E8956A" rotation="35" originX="231" originY="144" />
           <Circle cx="203" cy="152" r="6" fill="#E8956A" />
         </G>
       )}
-      {pose === 'trick_high5' && (
+      {(pose === 'trick_high5' || pose === 'social_kiss') && (
         <G>
           <Rect x="209" y="116" width="26" height="8" rx="4" fill="#E8956A" rotation="18" originX="231" originY="120" />
           <Circle cx="206" cy="124" r="6" fill="#E8956A" />
         </G>
       )}
-      {pose === 'come' && (
+      {(pose === 'come' || pose === 'stay2_come' || pose === 'recall2_come' || pose === 'field_go' || pose === 'combo_come') && (
         <G>
           <Rect x="215" y="110" width="18" height="8" rx="4" fill="#E8956A" rotation="30" originX="231" originY="114" />
           <Circle cx="215" cy="126" r="6" fill="#E8956A" />
         </G>
       )}
-      {pose === 'down' && (
+      {(pose === 'down' || pose === 'recall2_down' || pose === 'field_stop' || pose === 'combo_down') && (
         <G>
           <Rect x="218" y="112" width="16" height="8" rx="4" fill="#E8956A" rotation="70" originX="231" originY="116" />
           <Circle cx="211" cy="144" r="6" fill="#E8956A" />
@@ -595,13 +610,13 @@ function Human({ pose }: { pose: string }) {
           <Circle cx="198" cy="112" r="6" fill="#D07050" />
         </G>
       )}
-      {pose === 'walk_sit' && (
+      {(pose === 'walk_sit' || pose === 'field_heel') && (
         <G>
           <Rect x="205" y="112" width="26" height="8" rx="4" fill="#E8956A" rotation="15" originX="231" originY="116" />
           <Circle cx="203" cy="120" r="6" fill="#E8956A" />
         </G>
       )}
-      {pose === 'walk_stay' && (
+      {(pose === 'walk_stay' || pose === 'stay2_wait') && (
         <G>
           <Rect x="215" y="72" width="12" height="34" rx="5" fill="#E8956A" rotation="-25" originX="231" originY="103" />
           <Circle cx="211" cy="70" r="7" fill="#E8956A" />
@@ -707,6 +722,16 @@ export default function DogScene({ illustration, language, size = 300 }: DogScen
             {illustration === 'trick_paw' && <DogTrickPaw col={col} wag={wag} />}
             {illustration === 'trick_high5' && <DogTrickHigh5 col={col} wag={wag} />}
             {illustration === 'trick_spin' && <DogTrickSpin col={col} wag={wag} />}
+            {/* Levels 6-10 reuse the poses above under new keys, so each gets
+                its own level color/bubble text without new SVG drawings. */}
+            {(illustration === 'stay2_sit' || illustration === 'recall2_sit' || illustration === 'combo_sit') && <DogSit col={col} wag={wag} />}
+            {(illustration === 'stay2_come' || illustration === 'recall2_come' || illustration === 'field_go' || illustration === 'combo_come') && <DogCome col={col} wag={wag} />}
+            {(illustration === 'recall2_down' || illustration === 'field_stop' || illustration === 'combo_down') && <DogDown col={col} wag={wag} />}
+            {illustration === 'field_heel' && <DogWalkSit col={col} wag={wag} />}
+            {illustration === 'stay2_wait' && <DogWalkStay col={col} wag={wag} language={language} />}
+            {illustration === 'social_wave' && <DogTrickPaw col={col} wag={wag} />}
+            {illustration === 'social_kiss' && <DogTrickHigh5 col={col} wag={wag} />}
+            {illustration === 'social_dance' && <DogTrickSpin col={col} wag={wag} />}
           </G>
         )}
       </Svg>
