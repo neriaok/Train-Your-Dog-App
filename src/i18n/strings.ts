@@ -97,10 +97,10 @@ export const STRINGS = {
     agent: {
       back: 'חזרה',
       title: '🤖 עוזר אילוף',
-      intro: 'שלום! אני עוזר האילוף. שאל אותי על פקודה, על רמה, או בקש "טיפ"!',
-      placeholder: 'שאל למשל: "מה זה שב?" או "מה יש ברמה 2"',
+      intro: 'שלום! אני עוזר האילוף שלך. אפשר לשאול אותי כמעט הכל - נביחות, נשיכות, לימוד ניקיון, חרדת פרידה, פקודות, טיפים ועוד 🐾',
+      placeholder: 'שאל למשל: "למה הכלב שלי נובח?" או "מה יש ברמה 2"',
       send: 'שלח',
-      fallback: 'לא הצלחתי למצוא תשובה לשאלה הזו 🤔 נסה לשאול על פקודה ספציפית (למשל "שב"), על רמה ("מה יש ברמה 2"), לבקש "טיפ", או לשאול "אילו פקודות יש".',
+      fallback: 'לא הצלחתי למצוא תשובה מדויקת לשאלה הזו 🤔 נסה לנסח אותה קצת אחרת, או שאל על נושא כמו נביחות, נשיכות, לימוד ניקיון, חרדת פרידה, פקודה ספציפית (למשל "שב"), או רמה ("מה יש ברמה 2").',
     },
     languagePicker: {
       title: 'בחרו שפה',
@@ -238,10 +238,10 @@ export const STRINGS = {
     agent: {
       back: 'Back',
       title: '🤖 Training Assistant',
-      intro: 'Hi! I\'m the training assistant. Ask me about a command, a level, or ask for a "tip"!',
-      placeholder: 'Try: "What is sit?" or "What\'s in level 2?"',
+      intro: 'Hi! I\'m your training assistant. Ask me almost anything - barking, biting, potty training, separation anxiety, commands, tips, and more 🐾',
+      placeholder: 'Try: "Why does my dog bark?" or "What\'s in level 2?"',
       send: 'Send',
-      fallback: 'I couldn\'t find an answer to that 🤔 Try asking about a specific command (e.g. "sit"), a level ("what\'s in level 2?"), ask for a "tip", or ask "what commands are there".',
+      fallback: 'I couldn\'t find a precise answer to that 🤔 Try rephrasing, or ask about a topic like barking, biting, potty training, separation anxiety, a specific command (e.g. "sit"), or a level ("what\'s in level 2?").',
     },
     languagePicker: {
       title: 'Choose Language',
