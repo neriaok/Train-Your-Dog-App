@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import PressableScale from '../components/PressableScale';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
-import { useDogProfile, AgeGroup, Experience } from '../profile/DogProfileContext';
+import { useDogProfile, AgeGroup, Experience, DogProfile } from '../profile/DogProfileContext';
 import { useTheme, Colors } from '../theme/ThemeContext';
 import { makeStyles as makeAuthStyles } from './authStyles';
 import { loadReminderTime, setReminderTime, ReminderTime } from '../notifications/reminders';
@@ -23,24 +23,42 @@ function Chip<T extends string>({ value, selected, label, onPress, styles }: { v
 export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).profile;
-  const { profile, saveProfile } = useDogProfile();
+  const { profiles, activeProfile, setActiveId, saveProfile, removeProfile } = useDogProfile();
   const { colors: C } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
   const authStyles = useMemo(() => makeAuthStyles(C), [C]);
 
-  const [name, setName] = useState(profile?.name ?? '');
-  const [breed, setBreed] = useState(profile?.breed ?? '');
-  const [photoUri, setPhotoUri] = useState<string | null>(profile?.photoUri ?? null);
-  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(profile?.ageGroup ?? null);
-  const [experience, setExperience] = useState<Experience | null>(profile?.experience ?? null);
+  const [editingId, setEditingId] = useState<string | null>(activeProfile?.id ?? null);
+  const [name, setName] = useState(activeProfile?.name ?? '');
+  const [breed, setBreed] = useState(activeProfile?.breed ?? '');
+  const [photoUri, setPhotoUri] = useState<string | null>(activeProfile?.photoUri ?? null);
+  const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(activeProfile?.ageGroup ?? null);
+  const [experience, setExperience] = useState<Experience | null>(activeProfile?.experience ?? null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [reminderTime, setReminderTimeState] = useState<ReminderTime>('off');
   const [reminderNotice, setReminderNotice] = useState<string | null>(null);
 
   useEffect(() => {
     loadReminderTime().then(setReminderTimeState);
   }, []);
+
+  const loadIntoForm = (p: DogProfile | null) => {
+    setEditingId(p?.id ?? null);
+    setName(p?.name ?? '');
+    setBreed(p?.breed ?? '');
+    setPhotoUri(p?.photoUri ?? null);
+    setAgeGroup(p?.ageGroup ?? null);
+    setExperience(p?.experience ?? null);
+    setError(null);
+    setConfirmDelete(false);
+  };
+
+  const selectDog = (p: DogProfile) => {
+    setActiveId(p.id);
+    loadIntoForm(p);
+  };
 
   const handleReminderChange = async (next: ReminderTime) => {
     setReminderNotice(null);
@@ -75,11 +93,22 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
     setError(null);
     setBusy(true);
     try {
-      await saveProfile({ name: trimmed, breed: breed.trim(), photoUri, ageGroup, experience });
+      await saveProfile({ name: trimmed, breed: breed.trim(), photoUri, ageGroup, experience }, editingId ?? undefined);
       onBack();
     } catch {
       setBusy(false);
       setError(t.saveFailed);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!editingId) return;
+    setBusy(true);
+    try {
+      await removeProfile(editingId);
+      onBack();
+    } catch {
+      setBusy(false);
     }
   };
 
@@ -93,6 +122,35 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
         </PressableScale>
         <Text style={authStyles.title}>{t.title}</Text>
       </View>
+
+      {profiles.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.switcherRow}
+          contentContainerStyle={[styles.switcherContent, rowDir]}
+        >
+          {profiles.map(p => (
+            <PressableScale
+              key={p.id}
+              onPress={() => selectDog(p)}
+              style={[styles.switcherChip, editingId === p.id && styles.switcherChipActive]}
+            >
+              {p.photoUri ? (
+                <Image source={{ uri: p.photoUri }} style={styles.switcherAvatar} />
+              ) : (
+                <Text style={styles.switcherAvatarEmoji}>🐕</Text>
+              )}
+              <Text style={[styles.switcherName, editingId === p.id && styles.switcherNameActive]} numberOfLines={1}>
+                {p.name}
+              </Text>
+            </PressableScale>
+          ))}
+          <PressableScale onPress={() => loadIntoForm(null)} style={[styles.switcherChip, editingId === null && styles.switcherChipActive]}>
+            <Text style={[styles.switcherName, editingId === null && styles.switcherNameActive]}>{t.switcherAddNew}</Text>
+          </PressableScale>
+        </ScrollView>
+      )}
 
       <ScrollView contentContainerStyle={authStyles.scroll} keyboardShouldPersistTaps="handled">
         <View style={authStyles.card}>
@@ -149,8 +207,8 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
             {reminderNotice && <Text style={styles.reminderNotice}>{reminderNotice}</Text>}
           </View>
 
-          {profile?.startDate && (
-            <Text style={styles.since}>{t.since(profile.startDate)}</Text>
+          {editingId && activeProfile?.startDate && (
+            <Text style={styles.since}>{t.since(activeProfile.startDate)}</Text>
           )}
           {error && <Text style={authStyles.error}>{error}</Text>}
 
@@ -161,6 +219,26 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
           <PressableScale onPress={onOpenJournal} style={styles.journalBtn}>
             <Text style={styles.journalBtnText}>{t.journalBtn}</Text>
           </PressableScale>
+
+          {editingId && (
+            confirmDelete ? (
+              <View style={styles.deleteConfirmRow}>
+                <Text style={styles.deleteConfirmText}>{t.deleteConfirm}</Text>
+                <View style={[styles.deleteConfirmBtns, rowDir]}>
+                  <PressableScale onPress={handleDelete} disabled={busy} style={styles.deleteYesBtn}>
+                    <Text style={styles.deleteYesText}>{t.deleteConfirmYes}</Text>
+                  </PressableScale>
+                  <PressableScale onPress={() => setConfirmDelete(false)} style={styles.deleteNoBtn}>
+                    <Text style={styles.deleteNoText}>{t.deleteConfirmNo}</Text>
+                  </PressableScale>
+                </View>
+              </View>
+            ) : (
+              <PressableScale onPress={() => setConfirmDelete(true)} style={styles.deleteBtn}>
+                <Text style={styles.deleteBtnText}>{t.deleteBtn}</Text>
+              </PressableScale>
+            )
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -168,6 +246,18 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
 }
 
 const makeStyles = (C: Colors) => StyleSheet.create({
+  switcherRow: { flexGrow: 0, marginBottom: 4 },
+  switcherContent: { gap: 8, paddingHorizontal: 20, paddingBottom: 8 },
+  switcherChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderWidth: 1.5, borderColor: C.border, backgroundColor: C.white,
+    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, maxWidth: 140,
+  },
+  switcherChipActive: { borderColor: C.orange, backgroundColor: C.orangeL },
+  switcherAvatar: { width: 22, height: 22, borderRadius: 11 },
+  switcherAvatarEmoji: { fontSize: 16 },
+  switcherName: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.text },
+  switcherNameActive: { color: C.orange },
   photoWrap: { alignItems: 'center', marginBottom: 4 },
   photo: { width: 96, height: 96, borderRadius: 48 },
   photoPlaceholder: {
@@ -192,4 +282,18 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     backgroundColor: C.bg, borderWidth: 1.5, borderColor: C.border,
   },
   journalBtnText: { fontSize: 14, fontFamily: 'Heebo_700Bold', color: C.text },
+  deleteBtn: { alignItems: 'center', paddingVertical: 10 },
+  deleteBtnText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: '#E5484D' },
+  deleteConfirmRow: {
+    marginTop: 4, paddingTop: 12, borderTopWidth: 1, borderTopColor: C.border,
+  },
+  deleteConfirmText: { fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.text, marginBottom: 8, textAlign: 'center' },
+  deleteConfirmBtns: { gap: 8 },
+  deleteYesBtn: { flex: 1, backgroundColor: '#E5484D', borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
+  deleteYesText: { color: 'white', fontSize: 12, fontFamily: 'Heebo_700Bold' },
+  deleteNoBtn: {
+    flex: 1, backgroundColor: C.bg, borderRadius: 10, paddingVertical: 10,
+    alignItems: 'center', borderWidth: 1, borderColor: C.border,
+  },
+  deleteNoText: { color: C.text, fontSize: 12, fontFamily: 'Heebo_700Bold' },
 });

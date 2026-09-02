@@ -157,6 +157,11 @@ export const STRINGS = {
       reminderMorning: 'בוקר (9:00)',
       reminderEvening: 'ערב (18:00)',
       reminderPermissionDenied: 'לא אושרה הרשאה להתראות - אפשר להפעיל אותה בהגדרות הדפדפן/המכשיר.',
+      switcherAddNew: '+ כלב חדש',
+      deleteBtn: '🗑️ מחקו את הכלב הזה',
+      deleteConfirm: 'למחוק את הפרופיל של הכלב? הפעולה בלתי הפיכה.',
+      deleteConfirmYes: 'כן, מחקו',
+      deleteConfirmNo: 'ביטול',
     },
     journal: {
       title: 'יומן האימון',
@@ -331,6 +336,11 @@ export const STRINGS = {
       reminderMorning: 'Morning (9:00)',
       reminderEvening: 'Evening (18:00)',
       reminderPermissionDenied: "Notification permission wasn't granted - you can enable it in your browser/device settings.",
+      switcherAddNew: '+ New dog',
+      deleteBtn: '🗑️ Delete this dog',
+      deleteConfirm: "Delete this dog's profile? This can't be undone.",
+      deleteConfirmYes: 'Yes, delete',
+      deleteConfirmNo: 'Cancel',
     },
     journal: {
       title: 'Training Journal',
