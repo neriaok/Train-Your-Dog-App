@@ -25,6 +25,17 @@ export default function JournalScreen({ onBack }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [mediaFilter, setMediaFilter] = useState<'all' | 'photo' | 'video'>('all');
+
+  const filteredEntries = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return entries.filter(e => {
+      if (mediaFilter !== 'all' && e.mediaType !== mediaFilter) return false;
+      if (q && !e.note.toLowerCase().includes(q) && !e.date.includes(q)) return false;
+      return true;
+    });
+  }, [entries, search, mediaFilter]);
 
   const pickMedia = async () => {
     if (Platform.OS !== 'web') {
@@ -106,10 +117,37 @@ export default function JournalScreen({ onBack }: Props) {
           </PressableScale>
         </View>
 
+        {entries.length > 0 && (
+          <View style={styles.filterWrap}>
+            <TextInput
+              style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+              value={search}
+              onChangeText={setSearch}
+              placeholder={t.searchPlaceholder}
+              placeholderTextColor={C.soft}
+            />
+            <View style={[styles.filterRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              {(['all', 'photo', 'video'] as const).map(f => (
+                <PressableScale
+                  key={f}
+                  onPress={() => setMediaFilter(f)}
+                  style={[styles.filterChip, mediaFilter === f && styles.filterChipActive]}
+                >
+                  <Text style={[styles.filterChipText, mediaFilter === f && styles.filterChipTextActive]}>
+                    {f === 'all' ? t.filterAll : f === 'photo' ? t.filterPhoto : t.filterVideo}
+                  </Text>
+                </PressableScale>
+              ))}
+            </View>
+          </View>
+        )}
+
         {entries.length === 0 ? (
           <Text style={styles.empty}>{t.empty}</Text>
+        ) : filteredEntries.length === 0 ? (
+          <Text style={styles.empty}>{t.noResults}</Text>
         ) : (
-          entries.map((entry: JournalEntry) => (
+          filteredEntries.map((entry: JournalEntry) => (
             <View key={entry.id} style={styles.entryCard}>
               <View style={[styles.entryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 {entry.mediaUri && entry.mediaType === 'photo' ? (
@@ -174,6 +212,20 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     textAlign: 'center', lineHeight: 16,
   },
   noteInput: { minHeight: 60, textAlignVertical: 'top', paddingTop: 12 },
+  filterWrap: { marginTop: 18, gap: 8 },
+  searchInput: {
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
+    borderRadius: 14, paddingHorizontal: 16, paddingVertical: 10,
+    fontSize: 13, fontFamily: 'Heebo_400Regular', color: C.text,
+  },
+  filterRow: { gap: 8 },
+  filterChip: {
+    borderWidth: 1.5, borderColor: C.border, borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 6, backgroundColor: C.white,
+  },
+  filterChipActive: { backgroundColor: C.orange, borderColor: C.orange },
+  filterChipText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.text },
+  filterChipTextActive: { color: 'white' },
   empty: {
     fontSize: 13, fontFamily: 'Heebo_400Regular', color: C.soft,
     textAlign: 'center', marginTop: 24,

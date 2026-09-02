@@ -190,6 +190,11 @@ export const STRINGS = {
       deleteConfirm: 'למחוק את הרשומה?',
       delete: 'מחיקה',
       cancel: 'ביטול',
+      searchPlaceholder: 'חיפוש לפי הערה או תאריך...',
+      filterAll: 'הכל',
+      filterPhoto: '📷 תמונות',
+      filterVideo: '🎥 וידאו',
+      noResults: 'לא נמצאו רשומות תואמות.',
     },
   },
   en: {
@@ -381,6 +386,11 @@ export const STRINGS = {
       deleteConfirm: 'Delete this entry?',
       delete: 'Delete',
       cancel: 'Cancel',
+      searchPlaceholder: 'Search by note or date...',
+      filterAll: 'All',
+      filterPhoto: '📷 Photos',
+      filterVideo: '🎥 Videos',
+      noResults: 'No matching entries found.',
     },
   },
 } as const;
