@@ -129,6 +129,7 @@ export const STRINGS = {
       placeholder: 'שאל למשל: "למה הכלב שלי נובח?" או "מה יש ברמה 2"',
       send: 'שלח',
       fallback: 'לא הצלחתי למצוא תשובה מדויקת לשאלה הזו 🤔 נסה לנסח אותה קצת אחרת, או שאל על נושא כמו נביחות, נשיכות, לימוד ניקיון, חרדת פרידה, פקודה ספציפית (למשל "שב"), או רמה ("מה יש ברמה 2").',
+      suggestions: ['למה הכלב שלי נובח?', 'איך מלמדים לימוד ניקיון?', 'תן לי טיפ', 'מה יש ברמה 2?'],
     },
     languagePicker: {
       title: 'בחרו שפה',
@@ -319,6 +320,7 @@ export const STRINGS = {
       placeholder: 'Try: "Why does my dog bark?" or "What\'s in level 2?"',
       send: 'Send',
       fallback: 'I couldn\'t find a precise answer to that 🤔 Try rephrasing, or ask about a topic like barking, biting, potty training, separation anxiety, a specific command (e.g. "sit"), or a level ("what\'s in level 2?").',
+      suggestions: ['Why does my dog bark?', 'How do I potty train?', 'Give me a tip', "What's in level 2?"],
     },
     languagePicker: {
       title: 'Choose Language',

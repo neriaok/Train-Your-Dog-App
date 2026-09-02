@@ -34,8 +34,8 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
   const historyRef = useRef<AgentMessage[]>([]);
   const scrollRef = useRef<ScrollView>(null);
 
-  const send = async () => {
-    const text = input.trim();
+  const send = async (override?: string) => {
+    const text = (override ?? input).trim();
     if (!text) return;
     setInput('');
     const typingId = `typing-${Date.now()}`;
@@ -101,6 +101,21 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
           })}
         </ScrollView>
 
+        {entries.length <= 1 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.suggestionsRow}
+            contentContainerStyle={[styles.suggestionsContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+          >
+            {t.suggestions.map(s => (
+              <PressableScale key={s} onPress={() => send(s)} style={styles.suggestionChip}>
+                <Text style={styles.suggestionText}>{s}</Text>
+              </PressableScale>
+            ))}
+          </ScrollView>
+        )}
+
         <View style={styles.inputRow}>
           <TextInput
             style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
@@ -108,10 +123,10 @@ export default function AgentChatScreen({ levels, onBack }: Props) {
             onChangeText={setInput}
             placeholder={t.placeholder}
             placeholderTextColor={C.soft}
-            onSubmitEditing={send}
+            onSubmitEditing={() => send()}
             returnKeyType="send"
           />
-          <PressableScale onPress={send} style={styles.sendBtn}>
+          <PressableScale onPress={() => send()} style={styles.sendBtn}>
             <Text style={styles.sendText}>{t.send}</Text>
           </PressableScale>
         </View>
@@ -182,6 +197,13 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   agentText: { color: C.text, fontSize: 14, fontFamily: 'Heebo_400Regular', lineHeight: 21 },
   typingBubble: { flexDirection: 'row', gap: 4, paddingVertical: 14 },
   typingDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.soft },
+  suggestionsRow: { flexGrow: 0 },
+  suggestionsContent: { gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
+  suggestionChip: {
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.orange + '50',
+    borderRadius: 16, paddingHorizontal: 14, paddingVertical: 8,
+  },
+  suggestionText: { fontSize: 12.5, fontFamily: 'Heebo_600SemiBold', color: C.orange },
   inputRow: {
     flexDirection: 'row', gap: 8, padding: 16, paddingTop: 8,
     borderTopWidth: 1, borderTopColor: C.border, backgroundColor: C.bg,
