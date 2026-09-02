@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  View, Text, ScrollView,
+  View, Text, TextInput, ScrollView,
   Animated, StyleSheet
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DogScene from '../components/DogScene';
 import Confetti from '../components/Confetti';
 import PressableScale from '../components/PressableScale';
@@ -12,6 +13,10 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { shareText } from '../utils/share';
 import { useTheme, Colors } from '../theme/ThemeContext';
+import { useAuth } from '../auth/AuthContext';
+import { submitFeedback } from '../feedback/submitFeedback';
+
+const FEEDBACK_SEEN_KEY = 'dogTrainingApp:feedbackPromptSeen';
 
 interface Props {
   levels: Level[];
@@ -26,8 +31,13 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
   const t = useStrings(language).success;
   const { theme, colors: C } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
+  const { isMock, user } = useAuth();
   const [confetti, setConfetti] = useState(true);
   const [shareNotice, setShareNotice] = useState(false);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackBusy, setFeedbackBusy] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const scale = useRef(new Animated.Value(0.85)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const trophyScale = useRef(new Animated.Value(0)).current;
@@ -54,6 +64,11 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    if (!isLast) return;
+    AsyncStorage.getItem(FEEDBACK_SEEN_KEY).then(seen => { if (!seen) setFeedbackVisible(true); });
+  }, [isLast]);
+
   const totalCommands = level.steps.reduce((a, s) => a + s.commands.length, 0);
 
   const handleShare = async () => {
@@ -62,6 +77,23 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
       setShareNotice(true);
       setTimeout(() => setShareNotice(false), 3000);
     }
+  };
+
+  const dismissFeedback = () => {
+    setFeedbackVisible(false);
+    AsyncStorage.setItem(FEEDBACK_SEEN_KEY, 'true');
+  };
+
+  const handleSendFeedback = async () => {
+    setFeedbackBusy(true);
+    try {
+      await submitFeedback(feedbackText.trim(), isMock, user?.id);
+      setFeedbackSent(true);
+    } catch {
+      // Best-effort - still mark as seen so a failed send doesn't nag forever.
+    }
+    AsyncStorage.setItem(FEEDBACK_SEEN_KEY, 'true');
+    setFeedbackBusy(false);
   };
 
   return (
@@ -143,6 +175,35 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
             <Text style={styles.shareText}>{t.shareBtn}</Text>
           </PressableScale>
           {shareNotice && <Text style={styles.shareNotice}>{t.shareCopied}</Text>}
+
+          {isLast && feedbackVisible && (
+            <View style={styles.feedbackCard}>
+              {feedbackSent ? (
+                <Text style={styles.feedbackThanks}>{t.feedbackThanks}</Text>
+              ) : (
+                <>
+                  <Text style={styles.feedbackTitle}>{t.feedbackTitle}</Text>
+                  <Text style={styles.feedbackBody}>{t.feedbackBody}</Text>
+                  <TextInput
+                    style={styles.feedbackInput}
+                    value={feedbackText}
+                    onChangeText={setFeedbackText}
+                    placeholder={t.feedbackPlaceholder}
+                    placeholderTextColor={C.soft}
+                    multiline
+                  />
+                  <View style={styles.feedbackBtns}>
+                    <PressableScale onPress={handleSendFeedback} disabled={feedbackBusy} style={styles.feedbackSendBtn}>
+                      <Text style={styles.feedbackSendText}>{feedbackBusy ? '...' : t.feedbackSend}</Text>
+                    </PressableScale>
+                    <PressableScale onPress={dismissFeedback} style={styles.feedbackSkipBtn}>
+                      <Text style={styles.feedbackSkipText}>{t.feedbackSkip}</Text>
+                    </PressableScale>
+                  </View>
+                </>
+              )}
+            </View>
+          )}
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
@@ -205,5 +266,35 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   shareNotice: {
     fontSize: 11, fontFamily: 'Heebo_500Medium', color: C.teal,
     textAlign: 'center', marginTop: 2,
+  },
+  feedbackCard: {
+    marginTop: 18, paddingTop: 18, borderTopWidth: 1, borderTopColor: C.border, width: '100%',
+  },
+  feedbackTitle: {
+    fontSize: 15, fontFamily: 'Heebo_800ExtraBold', color: C.text,
+    textAlign: 'center', marginBottom: 4,
+  },
+  feedbackBody: {
+    fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft,
+    textAlign: 'center', marginBottom: 12,
+  },
+  feedbackInput: {
+    backgroundColor: C.bg, borderWidth: 1.5, borderColor: C.border,
+    borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10,
+    fontSize: 13, fontFamily: 'Heebo_400Regular', color: C.text,
+    minHeight: 60, textAlignVertical: 'top', marginBottom: 10,
+  },
+  feedbackBtns: { flexDirection: 'row', gap: 8 },
+  feedbackSendBtn: {
+    flex: 1, backgroundColor: C.orange, borderRadius: 12, paddingVertical: 11, alignItems: 'center',
+  },
+  feedbackSendText: { color: 'white', fontSize: 13, fontFamily: 'Heebo_700Bold' },
+  feedbackSkipBtn: {
+    flex: 1, backgroundColor: C.bg, borderRadius: 12, paddingVertical: 11,
+    alignItems: 'center', borderWidth: 1.5, borderColor: C.border,
+  },
+  feedbackSkipText: { color: C.soft, fontSize: 13, fontFamily: 'Heebo_600SemiBold' },
+  feedbackThanks: {
+    fontSize: 14, fontFamily: 'Heebo_700Bold', color: C.teal, textAlign: 'center',
   },
 });

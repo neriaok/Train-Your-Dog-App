@@ -652,7 +652,12 @@ interface DogSceneProps {
   size?: number;
 }
 
-export default function DogScene({ illustration, language, size = 300 }: DogSceneProps) {
+// Wrapped in React.memo: the illustration switch below builds a fairly
+// large SVG shape tree, and this component's props rarely change on a
+// parent re-render (e.g. StepScreen re-rendering for unrelated state), so
+// skipping that rebuild when illustration/language/size are unchanged is a
+// meaningful win.
+function DogScene({ illustration, language, size = 300 }: DogSceneProps) {
   const col = collarColors[illustration] || '#FF6B35';
   const bubbleText = bubbleTexts[language][illustration] || '';
   const isCrateScene = illustration === 'crate_enter' || illustration === 'crate_return' || illustration === 'crate_full';
@@ -738,3 +743,5 @@ export default function DogScene({ illustration, language, size = 300 }: DogScen
     </Animated.View>
   );
 }
+
+export default React.memo(DogScene);
