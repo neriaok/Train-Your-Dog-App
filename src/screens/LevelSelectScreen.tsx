@@ -22,9 +22,10 @@ interface Props {
   onOpenAuth: () => void;
   onOpenUpgrade: () => void;
   onOpenProfile: () => void;
+  onOpenTrophies: () => void;
 }
 
-export default function LevelSelectScreen({ levels, completed, streak, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade, onOpenProfile }: Props) {
+export default function LevelSelectScreen({ levels, completed, streak, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade, onOpenProfile, onOpenTrophies }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).levels;
   const { user, isPremium, signOut } = useAuth();
@@ -111,6 +112,9 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
               )}
             </PressableScale>
           )}
+          <PressableScale onPress={onOpenTrophies} style={styles.trophyBtn} accessibilityLabel={t.trophyRoomLabel}>
+            <Text style={styles.trophyBtnText}>🏆</Text>
+          </PressableScale>
           <ThemeToggle />
           <LanguagePicker />
         </View>
@@ -272,6 +276,12 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6, maxWidth: 220,
   },
   accountBtnText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.text },
+  trophyBtn: {
+    backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border,
+    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  trophyBtnText: { fontSize: 14 },
   dog: { fontSize: 44, textAlign: 'center', marginBottom: 8 },
   heroPhoto: {
     width: 64, height: 64, borderRadius: 32, alignSelf: 'center', marginBottom: 8,
