@@ -17,7 +17,7 @@ export default function SplashScreen({ onStart, onOpenAuth }: Props) {
   const t = useStrings(language).splash;
   const tLevels = useStrings(language).levels;
   const { user, isPremium, signOut } = useAuth();
-  const { colors: C } = useTheme();
+  const { colors: C, stylePack } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(30)).current;
@@ -48,7 +48,7 @@ export default function SplashScreen({ onStart, onOpenAuth }: Props) {
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.card, { opacity: fade, transform: [{ translateY: slide }] }]}>
-          <DogScene illustration="sit" language={language} size={280} />
+          <DogScene illustration="sit" language={language} size={280} furPack={stylePack} />
 
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{t.badge}</Text>
@@ -96,7 +96,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     backgroundColor: C.orangeL, borderRadius: 20,
     paddingHorizontal: 14, paddingVertical: 4, marginBottom: 14, marginTop: 4,
   },
-  badgeText: { color: C.orange, fontSize: 12, fontFamily: 'Heebo_700Bold' },
+  badgeText: { color: C.orangeText, fontSize: 12, fontFamily: 'Heebo_700Bold' },
   title: {
     fontSize: 28, fontFamily: 'Heebo_800ExtraBold',
     color: C.text, marginBottom: 10, textAlign: 'center',

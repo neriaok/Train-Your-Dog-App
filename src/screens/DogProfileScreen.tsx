@@ -6,7 +6,7 @@ import PressableScale from '../components/PressableScale';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useDogProfile, AgeGroup, Experience, DogProfile } from '../profile/DogProfileContext';
-import { useTheme, Colors } from '../theme/ThemeContext';
+import { useTheme, Colors, StylePack } from '../theme/ThemeContext';
 import { makeStyles as makeAuthStyles } from './authStyles';
 import { loadReminderTime, setReminderTime, ReminderTime } from '../notifications/reminders';
 
@@ -24,7 +24,7 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).profile;
   const { profiles, activeProfile, setActiveId, saveProfile, removeProfile } = useDogProfile();
-  const { colors: C } = useTheme();
+  const { colors: C, stylePack, setStylePack } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
   const authStyles = useMemo(() => makeAuthStyles(C), [C]);
 
@@ -165,6 +165,15 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
             <Text style={styles.photoHint}>{photoUri ? t.changePhoto : t.photoHint}</Text>
           </PressableScale>
 
+          <View>
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>{t.vibeLabel}</Text>
+            <View style={[styles.chipRow, rowDir]}>
+              <Chip value="classic" selected={stylePack === 'classic'} label={t.vibeClassic} onPress={setStylePack} styles={styles} />
+              <Chip value="wolf" selected={stylePack === 'wolf'} label={t.vibeWolf} onPress={setStylePack} styles={styles} />
+            </View>
+            <Text style={styles.vibeHint}>{t.vibeHint}</Text>
+          </View>
+
           <TextInput
             style={[authStyles.input, { textAlign: isRTL ? 'right' : 'left' }]}
             value={name}
@@ -257,7 +266,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   switcherAvatar: { width: 22, height: 22, borderRadius: 11 },
   switcherAvatarEmoji: { fontSize: 16 },
   switcherName: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.text },
-  switcherNameActive: { color: C.orange },
+  switcherNameActive: { color: C.orangeText },
   photoWrap: { alignItems: 'center', marginBottom: 4 },
   photo: { width: 96, height: 96, borderRadius: 48 },
   photoPlaceholder: {
@@ -265,7 +274,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   photoPlaceholderEmoji: { fontSize: 40 },
-  photoHint: { marginTop: 8, fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange },
+  photoHint: { marginTop: 8, fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orangeText },
   since: { fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft, textAlign: 'center' },
   fieldLabel: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.soft, marginBottom: 6 },
   chipRow: { flexWrap: 'wrap', gap: 8 },
@@ -277,6 +286,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   chipText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.text },
   chipTextActive: { color: 'white' },
   reminderNotice: { fontSize: 11, fontFamily: 'Heebo_400Regular', color: C.soft, marginTop: 6 },
+  vibeHint: { fontSize: 11, fontFamily: 'Heebo_400Regular', color: C.soft, marginTop: 6, lineHeight: 16 },
   journalBtn: {
     alignItems: 'center', paddingVertical: 12, borderRadius: 14,
     backgroundColor: C.bg, borderWidth: 1.5, borderColor: C.border,

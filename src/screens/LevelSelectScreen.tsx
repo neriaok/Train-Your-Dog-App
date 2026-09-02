@@ -81,7 +81,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
     }
   });
   if (streak.streak >= 3) {
-    badges.push({ key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orange });
+    badges.push({ key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orangeText });
   }
   if (levels.length > 0 && completed.length === levels.length) {
     badges.push({ key: 'alldone', emoji: '🏆', label: t.badgeAllDone, color: C.purpleText });
@@ -178,7 +178,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
                 <Text style={[styles.reviewTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.reviewCardTitle}</Text>
                 <Text style={[styles.reviewBody, { textAlign: isRTL ? 'right' : 'left' }]}>{t.reviewCardBody}</Text>
               </View>
-              <Text style={[styles.arrow, { color: C.orange }]}>{isRTL ? '←' : '→'}</Text>
+              <Text style={[styles.arrow, { color: C.orangeText }]}>{isRTL ? '←' : '→'}</Text>
             </View>
           </PressableScale>
         )}
@@ -318,12 +318,12 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     shadowRadius: 8, elevation: 3, borderWidth: 1, borderColor: C.border,
   },
   streakRow: { flexDirection: 'row', marginTop: 10 },
-  streakText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.orange },
+  streakText: { fontSize: 12, fontFamily: 'Heebo_700Bold', color: C.orangeText },
   reminderBanner: {
     backgroundColor: C.orangeL, borderWidth: 1.5, borderColor: C.orange + '40',
     borderRadius: 14, padding: 12, marginBottom: 16,
   },
-  reminderText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange, textAlign: 'center' },
+  reminderText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orangeText, textAlign: 'center' },
   personalTip: {
     backgroundColor: C.purpleL, borderWidth: 1.5, borderColor: C.purple + '30',
     borderRadius: 14, padding: 12, marginBottom: 16,

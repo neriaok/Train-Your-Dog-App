@@ -203,7 +203,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     backgroundColor: C.white, borderWidth: 1.5, borderColor: C.orange + '50',
     borderRadius: 16, paddingHorizontal: 14, paddingVertical: 8,
   },
-  suggestionText: { fontSize: 12.5, fontFamily: 'Heebo_600SemiBold', color: C.orange },
+  suggestionText: { fontSize: 12.5, fontFamily: 'Heebo_600SemiBold', color: C.orangeText },
   inputRow: {
     flexDirection: 'row', gap: 8, padding: 16, paddingTop: 8,
     borderTopWidth: 1, borderTopColor: C.border, backgroundColor: C.bg,

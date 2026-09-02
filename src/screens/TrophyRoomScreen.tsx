@@ -28,7 +28,7 @@ export default function TrophyRoomScreen({ levels, completed, streak, onBack }: 
   const allDone = levels.length > 0 && completed.length === levels.length;
 
   const specialBadges = [
-    streak.streak >= 3 && { key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orange },
+    streak.streak >= 3 && { key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orangeText },
     streak.weeklyGoalMet && { key: 'weekly', emoji: '🎯', label: t.weeklyBadge, color: C.teal },
     allDone && { key: 'alldone', emoji: '🏆', label: t.allDoneBadge, color: C.purpleText },
   ].filter(Boolean) as { key: string; emoji: string; label: string; color: string }[];

@@ -206,7 +206,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   mediaPlaceholderEmoji: { fontSize: 36 },
-  mediaHint: { marginTop: 8, fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orange },
+  mediaHint: { marginTop: 8, fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.orangeText },
   videoNote: {
     fontSize: 11, fontFamily: 'Heebo_400Regular', color: C.soft,
     textAlign: 'center', lineHeight: 16,

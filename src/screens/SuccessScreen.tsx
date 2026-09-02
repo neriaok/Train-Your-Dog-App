@@ -29,7 +29,7 @@ interface Props {
 export default function SuccessScreen({ levels, level, isLast, onNext, onRestart }: Props) {
   const { language } = useLanguage();
   const t = useStrings(language).success;
-  const { theme, colors: C } = useTheme();
+  const { theme, colors: C, stylePack } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
   const { isMock, user } = useAuth();
   const [confetti, setConfetti] = useState(true);
@@ -110,7 +110,7 @@ export default function SuccessScreen({ levels, level, isLast, onNext, onRestart
             ))}
           </View>
 
-          <DogScene illustration={successPose} language={language} size={260} />
+          <DogScene illustration={successPose} language={language} size={260} furPack={stylePack} />
 
           <Text style={styles.title}>{t.title}</Text>
           <Text style={[styles.sub, { color: level.color }]}>

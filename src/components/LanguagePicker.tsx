@@ -65,5 +65,5 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   },
   rowActive: { backgroundColor: C.orangeL },
   rowText: { fontSize: 15, fontFamily: 'Heebo_600SemiBold', color: C.text },
-  check: { fontSize: 16, fontFamily: 'Heebo_800ExtraBold', color: C.orange },
+  check: { fontSize: 16, fontFamily: 'Heebo_800ExtraBold', color: C.orangeText },
 });

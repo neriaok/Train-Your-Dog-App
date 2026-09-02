@@ -172,6 +172,11 @@ export const LEVEL_SKELETONS: LevelSkeleton[] = [
 
 export const C = {
   orange: "#FF6B35", orangeL: "#FFF0EA", orangeM: "#FFCDB2",
+  // Same value as `orange` in the classic palette (no visible change here) -
+  // exists so the "wolf" style pack can point it at a shade tuned for
+  // reading as text, separately from `orange` staying tuned for button
+  // fills with white text on top. See ThemeContext's STYLE_PACKS.
+  orangeText: "#FF6B35",
   teal: "#2EC4B6", tealL: "#E8FAF9", tealM: "#A8EDE9",
   yellow: "#FFD166", yellowL: "#FFF9E6",
   purple: "#9B5DE5", purpleL: "#F3EDFF",

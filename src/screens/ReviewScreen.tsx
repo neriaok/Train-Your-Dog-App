@@ -51,7 +51,7 @@ function buildQuestions(levels: Level[], completed: number[]): Question[] {
 export default function ReviewScreen({ levels, completed, onBack }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).review;
-  const { colors: C } = useTheme();
+  const { colors: C, stylePack } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
 
   const [questions] = useState(() => buildQuestions(levels, completed));
@@ -133,7 +133,7 @@ export default function ReviewScreen({ levels, completed, onBack }: Props) {
         <Text style={styles.progressText}>{t.questionProgress(index + 1, questions.length)}</Text>
 
         <View style={styles.sceneWrap}>
-          <DogScene illustration={question.step.illustration} language={language} size={220} />
+          <DogScene illustration={question.step.illustration} language={language} size={220} furPack={stylePack} />
         </View>
 
         <Text style={styles.prompt}>{t.prompt}</Text>

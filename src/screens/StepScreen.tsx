@@ -55,7 +55,7 @@ function CmdBadge({ cmd, delay, visible, color }: {
 export default function StepScreen({ level, step, stepIdx, totalSteps, onComplete, onBack }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).step;
-  const { theme, colors: C } = useTheme();
+  const { theme, colors: C, stylePack } = useTheme();
   const styles = useMemo(() => makeStyles(C), [C]);
   const [cmdsVisible, setCmdsVisible] = useState(false);
   const [done, setDone] = useState(false);
@@ -116,7 +116,7 @@ export default function StepScreen({ level, step, stepIdx, totalSteps, onComplet
         {/* Scene + Commands */}
         <View style={styles.card}>
           <View style={{ alignItems: 'center' }}>
-            <DogScene illustration={step.illustration} language={language} size={300} />
+            <DogScene illustration={step.illustration} language={language} size={300} furPack={stylePack} />
           </View>
           <Text style={styles.cmdLabel}>{t.commandsLabel}</Text>
           <View style={styles.cmdsRow}>
