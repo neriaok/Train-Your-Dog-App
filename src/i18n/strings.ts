@@ -133,6 +133,17 @@ export const STRINGS = {
     languagePicker: {
       title: 'בחרו שפה',
     },
+    onboarding: {
+      skip: 'דלגו',
+      next: 'הבא',
+      start: 'בואו נתחיל! 🚀',
+      slides: [
+        { emoji: '🐾', title: 'ברוכים הבאים!', body: 'האפליקציה תלווה אתכם צעד-צעד באילוף הכלב שלכם, דרך 10 רמות שמסלימות בהדרגה.' },
+        { emoji: '🐕', title: 'פרופיל הכלב והיומן', body: 'הוסיפו את הכלב שלכם (אפשר יותר מאחד!) ותעדו את ההתקדמות בתמונות ווידאו ביומן האימון.' },
+        { emoji: '🤖', title: 'עוזר האילוף', body: 'יש שאלה? העוזר החכם כאן לענות - מנביחות ועד טיפים מקצועיים, בכל שעה.' },
+        { emoji: '🔥', title: 'רצף, תגים ותרגול', body: 'שמרו על רצף יומי, אספו תגים באלבום ההישגים, ותרגלו את מה שלמדתם במצב התרגול.' },
+      ],
+    },
     profile: {
       title: 'פרופיל הכלב',
       back: 'חזרה',
@@ -311,6 +322,17 @@ export const STRINGS = {
     },
     languagePicker: {
       title: 'Choose Language',
+    },
+    onboarding: {
+      skip: 'Skip',
+      next: 'Next',
+      start: "Let's start! 🚀",
+      slides: [
+        { emoji: '🐾', title: 'Welcome!', body: 'This app walks you step by step through training your dog, across 10 levels that build on each other.' },
+        { emoji: '🐕', title: 'Dog Profile & Journal', body: 'Add your dog (you can add more than one!) and log progress with photos and videos in the training journal.' },
+        { emoji: '🤖', title: 'Training Assistant', body: 'Got a question? The smart assistant is here to answer - from barking to professional tips, anytime.' },
+        { emoji: '🔥', title: 'Streaks, Badges & Practice', body: "Keep a daily streak, collect badges in the trophy room, and quiz yourself on what you've learned in practice mode." },
+      ],
     },
     profile: {
       title: 'Dog Profile',

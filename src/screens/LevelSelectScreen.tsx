@@ -5,6 +5,7 @@ import ProgressBar from '../components/ProgressBar';
 import PressableScale from '../components/PressableScale';
 import LanguagePicker from '../components/LanguagePicker';
 import ThemeToggle from '../components/ThemeToggle';
+import OnboardingTour from '../components/OnboardingTour';
 import { Level } from '../data';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
@@ -91,6 +92,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
 
   return (
     <SafeAreaView style={styles.safe}>
+      <OnboardingTour />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={[styles.topRow, { justifyContent: isRTL ? 'flex-start' : 'flex-end' }]}>
           {user ? (
