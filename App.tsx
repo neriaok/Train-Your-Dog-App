@@ -16,6 +16,7 @@ import UpgradeScreen from './src/screens/UpgradeScreen';
 import DogProfileScreen from './src/screens/DogProfileScreen';
 import JournalScreen from './src/screens/JournalScreen';
 import TrophyRoomScreen from './src/screens/TrophyRoomScreen';
+import ReviewScreen from './src/screens/ReviewScreen';
 import { LanguageProvider, useLanguage } from './src/i18n/LanguageContext';
 import { useLevels } from './src/i18n/useLevels';
 import { AuthProvider, useAuth } from './src/auth/AuthContext';
@@ -29,7 +30,7 @@ import { checkAndNotifyIfDue } from './src/notifications/reminders';
 
 SplashScreen.preventAutoHideAsync();
 
-type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent' | 'auth' | 'upgrade' | 'profile' | 'journal' | 'trophies';
+type Screen = 'splash' | 'levels' | 'step' | 'success' | 'agent' | 'auth' | 'upgrade' | 'profile' | 'journal' | 'trophies' | 'review';
 
 const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
 const CURRENT_POSITION_KEY = 'dogTrainingApp:currentPosition';
@@ -174,6 +175,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
   const handleOpenProfile = () => setScreen('profile');
   const handleOpenJournal = () => setScreen('journal');
   const handleOpenTrophies = () => setScreen('trophies');
+  const handleOpenReview = () => setScreen('review');
 
   return (
     <View style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }} onLayout={onLayoutRootView}>
@@ -192,6 +194,7 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
             onSelect={handleSelect} onOpenAgent={handleOpenAgent}
             onOpenAuth={handleOpenAuth} onOpenUpgrade={handleOpenUpgrade}
             onOpenProfile={handleOpenProfile} onOpenTrophies={handleOpenTrophies}
+            onOpenReview={handleOpenReview}
           />
         )}
         {screen === 'agent' && <AgentChatScreen levels={LEVELS} onBack={handleBack} />}
@@ -201,6 +204,9 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
         {screen === 'journal' && <JournalScreen onBack={handleBack} />}
         {screen === 'trophies' && (
           <TrophyRoomScreen levels={LEVELS} completed={completed} streak={streak} onBack={handleBack} />
+        )}
+        {screen === 'review' && (
+          <ReviewScreen levels={LEVELS} completed={completed} onBack={handleBack} />
         )}
         {screen === 'step' && level && step && (
           <StepScreen

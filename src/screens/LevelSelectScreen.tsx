@@ -23,9 +23,10 @@ interface Props {
   onOpenUpgrade: () => void;
   onOpenProfile: () => void;
   onOpenTrophies: () => void;
+  onOpenReview: () => void;
 }
 
-export default function LevelSelectScreen({ levels, completed, streak, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade, onOpenProfile, onOpenTrophies }: Props) {
+export default function LevelSelectScreen({ levels, completed, streak, onSelect, onOpenAgent, onOpenAuth, onOpenUpgrade, onOpenProfile, onOpenTrophies, onOpenReview }: Props) {
   const { language, isRTL } = useLanguage();
   const t = useStrings(language).levels;
   const { user, isPremium, signOut } = useAuth();
@@ -166,6 +167,19 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
             {streak.weeklyGoalMet ? t.weeklyChallengeDone : t.weeklyChallengeProgress(streak.weeklyCount, WEEKLY_GOAL)}
           </Text>
         </View>
+
+        {completed.length > 0 && (
+          <PressableScale onPress={onOpenReview} style={styles.reviewCard}>
+            <View style={[styles.reviewRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.reviewEmoji}>🧠</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.reviewTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.reviewCardTitle}</Text>
+                <Text style={[styles.reviewBody, { textAlign: isRTL ? 'right' : 'left' }]}>{t.reviewCardBody}</Text>
+              </View>
+              <Text style={[styles.arrow, { color: C.orange }]}>{isRTL ? '←' : '→'}</Text>
+            </View>
+          </PressableScale>
+        )}
 
         {badges.length > 0 && (
           <ScrollView
@@ -325,6 +339,14 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     backgroundColor: C.bg,
   },
   weeklyText: { fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft },
+  reviewCard: {
+    backgroundColor: C.white, borderRadius: 16, padding: 14, marginBottom: 16,
+    borderWidth: 1.5, borderColor: C.border,
+  },
+  reviewRow: { alignItems: 'center', gap: 12 },
+  reviewEmoji: { fontSize: 26 },
+  reviewTitle: { fontSize: 14, fontFamily: 'Heebo_700Bold', color: C.text, marginBottom: 2 },
+  reviewBody: { fontSize: 12, fontFamily: 'Heebo_400Regular', color: C.soft },
   badgesRow: { marginBottom: 16 },
   badgesRowContent: { gap: 8, paddingRight: 2 },
   badgeChip: {
