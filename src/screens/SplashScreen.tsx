@@ -5,6 +5,7 @@ import DogScene from '../components/DogScene';
 import PressableScale from '../components/PressableScale';
 import LanguagePicker from '../components/LanguagePicker';
 import ThemeToggle from '../components/ThemeToggle';
+import VibePrompt from '../components/VibePrompt';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useStrings } from '../i18n/strings';
 import { useAuth } from '../auth/AuthContext';
@@ -31,6 +32,7 @@ export default function SplashScreen({ onStart, onOpenAuth }: Props) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <VibePrompt />
       <View style={[styles.topRow, { justifyContent: isRTL ? 'flex-start' : 'flex-end' }]}>
         {user ? (
           <PressableScale onPress={signOut} style={styles.accountBtn}>
@@ -88,7 +90,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   card: {
     backgroundColor: C.white, borderRadius: 32, padding: 28,
     width: '100%', maxWidth: 400, alignItems: 'center',
-    shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+    shadowColor: C.orange, shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12, shadowRadius: 24, elevation: 8,
     borderWidth: 1, borderColor: C.border,
   },
@@ -109,9 +111,9 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   tag: { backgroundColor: C.tealL, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4 },
   tagText: { color: C.teal, fontSize: 12, fontFamily: 'Heebo_600SemiBold' },
   cta: {
-    backgroundColor: '#FF6B35', borderRadius: 20,
+    backgroundColor: C.orange, borderRadius: 20,
     paddingVertical: 17, width: '100%', alignItems: 'center',
-    shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+    shadowColor: C.orange, shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
   },
   ctaText: { color: 'white', fontSize: 19, fontFamily: 'Heebo_800ExtraBold' },

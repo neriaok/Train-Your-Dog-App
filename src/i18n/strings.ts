@@ -140,6 +140,13 @@ export const STRINGS = {
     languagePicker: {
       title: 'בחרו שפה',
     },
+    vibePrompt: {
+      title: 'איזו אווירה מתאימה לכם?',
+      body: 'אפשר לשנות את זה בכל שלב מפרופיל הכלב.',
+      classicLabel: '🐕 קלאסי',
+      wolfLabel: '🐺 זאבי',
+      decideLater: 'אחליט אחר כך',
+    },
     onboarding: {
       skip: 'דלגו',
       next: 'הבא',
@@ -345,6 +352,13 @@ export const STRINGS = {
     },
     languagePicker: {
       title: 'Choose Language',
+    },
+    vibePrompt: {
+      title: 'Which vibe fits you?',
+      body: 'You can change this anytime from the dog profile.',
+      classicLabel: '🐕 Classic',
+      wolfLabel: '🐺 Wolf',
+      decideLater: "I'll decide later",
     },
     onboarding: {
       skip: 'Skip',
