@@ -143,11 +143,11 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     marginBottom: 18, fontFamily: 'Heebo_400Regular',
   },
   notice: {
-    fontSize: 12, color: C.purple, fontFamily: 'Heebo_500Medium',
+    fontSize: 12, color: C.purpleText, fontFamily: 'Heebo_500Medium',
     textAlign: 'center', marginBottom: 14,
   },
   premiumNotice: {
-    fontSize: 15, color: C.purple, fontFamily: 'Heebo_800ExtraBold',
+    fontSize: 15, color: C.purpleText, fontFamily: 'Heebo_800ExtraBold',
     textAlign: 'center', marginBottom: 14,
   },
   demoNote: {

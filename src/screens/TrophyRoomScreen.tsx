@@ -30,7 +30,7 @@ export default function TrophyRoomScreen({ levels, completed, streak, onBack }: 
   const specialBadges = [
     streak.streak >= 3 && { key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orange },
     streak.weeklyGoalMet && { key: 'weekly', emoji: '🎯', label: t.weeklyBadge, color: C.teal },
-    allDone && { key: 'alldone', emoji: '🏆', label: t.allDoneBadge, color: C.purple },
+    allDone && { key: 'alldone', emoji: '🏆', label: t.allDoneBadge, color: C.purpleText },
   ].filter(Boolean) as { key: string; emoji: string; label: string; color: string }[];
 
   const handleShare = async () => {
@@ -135,7 +135,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   },
   certificateEmoji: { fontSize: 44, marginBottom: 6 },
   certificateTitle: {
-    fontSize: 18, fontFamily: 'Heebo_800ExtraBold', color: C.purple,
+    fontSize: 18, fontFamily: 'Heebo_800ExtraBold', color: C.purpleText,
     marginBottom: 8, textAlign: 'center',
   },
   certificateBody: {

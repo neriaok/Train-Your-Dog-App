@@ -20,7 +20,7 @@ export const darkColors: Colors = {
   orangeL: '#3A2418', orangeM: '#5C3524',
   tealL: '#0F2E2C', tealM: '#1A4F49',
   yellowL: '#3D3115',
-  purpleL: '#2A1F3D',
+  purpleL: '#2A1F3D', purpleText: '#C29CF2',
   greenL: '#0F3D30',
   bg: '#14141F', white: '#1E1E2E',
   text: '#F0EDE6', soft: '#9CA3AF', border: '#2E2E42',

@@ -175,6 +175,10 @@ export const C = {
   teal: "#2EC4B6", tealL: "#E8FAF9", tealM: "#A8EDE9",
   yellow: "#FFD166", yellowL: "#FFF9E6",
   purple: "#9B5DE5", purpleL: "#F3EDFF",
+  // Purple as body/caption text (vs. as a button fill, where white-on-purple
+  // is the pairing) is a touch too light to clear WCAG AA contrast against
+  // these light surfaces - this darker read-only variant is for that case.
+  purpleText: "#8A42DE",
   green: "#06D6A0", greenL: "#E6FBF5",
   bg: "#FFFBF7", white: "#FFFFFF",
   text: "#1A1A2E", soft: "#6B7280", border: "#F0E8E0",

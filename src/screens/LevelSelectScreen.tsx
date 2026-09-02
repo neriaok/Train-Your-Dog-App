@@ -84,7 +84,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
     badges.push({ key: 'streak', emoji: '🔥', label: t.streakBadge(streak.streak), color: C.orange });
   }
   if (levels.length > 0 && completed.length === levels.length) {
-    badges.push({ key: 'alldone', emoji: '🏆', label: t.badgeAllDone, color: C.purple });
+    badges.push({ key: 'alldone', emoji: '🏆', label: t.badgeAllDone, color: C.purpleText });
   }
   if (streak.weeklyGoalMet) {
     badges.push({ key: 'weekly', emoji: '🎯', label: t.weeklyBadge, color: C.teal });
@@ -238,7 +238,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
               )}
               <View style={styles.cardRow}>
                 <View style={[styles.cardText, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-                  <Text style={[styles.levelNum, { color: locked ? C.soft : premiumLocked ? C.purple : lvl.color, textAlign: isRTL ? 'right' : 'left' }]}>
+                  <Text style={[styles.levelNum, { color: locked ? C.soft : premiumLocked ? C.purpleText : lvl.color, textAlign: isRTL ? 'right' : 'left' }]}>
                     {t.levelLabel(lvl.id)}
                   </Text>
                   <Text style={[styles.levelTitle, { color: locked ? C.soft : C.text, textAlign: isRTL ? 'right' : 'left' }]}>
@@ -255,7 +255,7 @@ export default function LevelSelectScreen({ levels, completed, streak, onSelect,
                   <Text style={styles.iconText}>{locked ? '🔒' : premiumLocked ? '👑' : lvl.emoji}</Text>
                 </View>
                 {!locked && (
-                  <Text style={[styles.arrow, { color: premiumLocked ? C.purple : lvl.color }]}>{isRTL ? '←' : '→'}</Text>
+                  <Text style={[styles.arrow, { color: premiumLocked ? C.purpleText : lvl.color }]}>{isRTL ? '←' : '→'}</Text>
                 )}
               </View>
             </PressableScale>
@@ -328,7 +328,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     backgroundColor: C.purpleL, borderWidth: 1.5, borderColor: C.purple + '30',
     borderRadius: 14, padding: 12, marginBottom: 16,
   },
-  personalTipText: { fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.purple, lineHeight: 18 },
+  personalTipText: { fontSize: 12, fontFamily: 'Heebo_500Medium', color: C.purpleText, lineHeight: 18 },
   weeklyCard: {
     backgroundColor: C.white, borderRadius: 16, padding: 14, marginBottom: 16,
     borderWidth: 1.5, borderColor: C.border,
@@ -403,6 +403,6 @@ const makeStyles = (C: Colors) => StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', zIndex: 1,
   },
   teaserCloseText: { fontSize: 15, color: C.soft, lineHeight: 16 },
-  teaserTitle: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.purple, marginBottom: 2 },
+  teaserTitle: { fontSize: 13, fontFamily: 'Heebo_700Bold', color: C.purpleText, marginBottom: 2 },
   teaserSub: { fontSize: 11.5, color: C.soft, fontFamily: 'Heebo_400Regular', lineHeight: 16 },
 });
