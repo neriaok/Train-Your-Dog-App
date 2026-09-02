@@ -124,6 +124,11 @@ export const STRINGS = {
       experienceLabel: 'ניסיון קודם באילוף (לא חובה)',
       experienceBeginner: 'פעם ראשונה',
       experienceExperienced: 'כבר אילפתי כלב',
+      reminderLabel: 'תזכורת יומית לתרגול',
+      reminderOff: 'כבוי',
+      reminderMorning: 'בוקר (9:00)',
+      reminderEvening: 'ערב (18:00)',
+      reminderPermissionDenied: 'לא אושרה הרשאה להתראות - אפשר להפעיל אותה בהגדרות הדפדפן/המכשיר.',
     },
     journal: {
       title: 'יומן האימון',
@@ -265,6 +270,11 @@ export const STRINGS = {
       experienceLabel: 'Previous training experience (optional)',
       experienceBeginner: 'First time',
       experienceExperienced: "I've trained a dog before",
+      reminderLabel: 'Daily practice reminder',
+      reminderOff: 'Off',
+      reminderMorning: 'Morning (9:00)',
+      reminderEvening: 'Evening (18:00)',
+      reminderPermissionDenied: "Notification permission wasn't granted - you can enable it in your browser/device settings.",
     },
     journal: {
       title: 'Training Journal',

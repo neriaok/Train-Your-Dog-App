@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, ScrollView, Image, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -8,6 +8,7 @@ import { useStrings } from '../i18n/strings';
 import { useDogProfile, AgeGroup, Experience } from '../profile/DogProfileContext';
 import { useTheme, Colors } from '../theme/ThemeContext';
 import { makeStyles as makeAuthStyles } from './authStyles';
+import { loadReminderTime, setReminderTime, ReminderTime } from '../notifications/reminders';
 
 interface Props { onBack: () => void; onOpenJournal: () => void; }
 
@@ -34,6 +35,22 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
   const [experience, setExperience] = useState<Experience | null>(profile?.experience ?? null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [reminderTime, setReminderTimeState] = useState<ReminderTime>('off');
+  const [reminderNotice, setReminderNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadReminderTime().then(setReminderTimeState);
+  }, []);
+
+  const handleReminderChange = async (next: ReminderTime) => {
+    setReminderNotice(null);
+    const ok = await setReminderTime(next, language);
+    if (ok) {
+      setReminderTimeState(next);
+    } else {
+      setReminderNotice(t.reminderPermissionDenied);
+    }
+  };
 
   const pickPhoto = async () => {
     if (Platform.OS !== 'web') {
@@ -122,6 +139,16 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
             </View>
           </View>
 
+          <View>
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>{t.reminderLabel}</Text>
+            <View style={[styles.chipRow, rowDir]}>
+              <Chip value="off" selected={reminderTime === 'off'} label={t.reminderOff} onPress={handleReminderChange} styles={styles} />
+              <Chip value="morning" selected={reminderTime === 'morning'} label={t.reminderMorning} onPress={handleReminderChange} styles={styles} />
+              <Chip value="evening" selected={reminderTime === 'evening'} label={t.reminderEvening} onPress={handleReminderChange} styles={styles} />
+            </View>
+            {reminderNotice && <Text style={styles.reminderNotice}>{reminderNotice}</Text>}
+          </View>
+
           {profile?.startDate && (
             <Text style={styles.since}>{t.since(profile.startDate)}</Text>
           )}
@@ -159,6 +186,7 @@ const makeStyles = (C: Colors) => StyleSheet.create({
   chipActive: { backgroundColor: C.orange, borderColor: C.orange },
   chipText: { fontSize: 12, fontFamily: 'Heebo_600SemiBold', color: C.text },
   chipTextActive: { color: 'white' },
+  reminderNotice: { fontSize: 11, fontFamily: 'Heebo_400Regular', color: C.soft, marginTop: 6 },
   journalBtn: {
     alignItems: 'center', paddingVertical: 12, borderRadius: 14,
     backgroundColor: C.bg, borderWidth: 1.5, borderColor: C.border,

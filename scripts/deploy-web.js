@@ -67,4 +67,32 @@ if (fs.existsSync(oldAssetDir)) {
   console.log(`Moved font assets out of a "node_modules" path and patched ${patched} file(s) referencing them.`);
 }
 
+// PWA support: manifest + service worker + icons, so the site is
+// "installable" (Add to Home Screen) on mobile and desktop browsers.
+// `expo export` regenerates dist/index.html from scratch every run with no
+// way to configure these via app.json (Metro's web export doesn't support
+// it the way the old webpack-based expo-cli did), so they're injected here
+// instead of being hand-edited into a file that would just get wiped.
+fs.copyFileSync(path.join(root, 'web', 'manifest.webmanifest'), path.join(dist, 'manifest.webmanifest'));
+fs.copyFileSync(path.join(root, 'web', 'sw.js'), path.join(dist, 'sw.js'));
+fs.copyFileSync(path.join(root, 'assets', 'icon.png'), path.join(dist, 'icon-192.png'));
+fs.copyFileSync(path.join(root, 'assets', 'icon.png'), path.join(dist, 'icon-512.png'));
+
+const indexPath = path.join(dist, 'index.html');
+let html = fs.readFileSync(indexPath, 'utf8');
+html = html.replace(
+  '</head>',
+  '  <link rel="manifest" href="/manifest.webmanifest">\n' +
+  '  <meta name="theme-color" content="#FF6B35">\n' +
+  '  <link rel="icon" href="/icon-192.png">\n' +
+  '  <link rel="apple-touch-icon" href="/icon-192.png">\n' +
+  '</head>'
+);
+html = html.replace(
+  '</body>',
+  '<script>if (\'serviceWorker\' in navigator) { window.addEventListener(\'load\', () => navigator.serviceWorker.register(\'/sw.js\')); }</script>\n</body>'
+);
+fs.writeFileSync(indexPath, html);
+console.log('Injected PWA manifest, service worker, and icons into the export.');
+
 run('vercel deploy --prod --yes --project train-your-dog-app --cwd ./dist');

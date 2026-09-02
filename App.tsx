@@ -24,6 +24,7 @@ import { JournalProvider } from './src/journal/JournalContext';
 import { loadStreak, recordPractice, StreakState } from './src/progress/streak';
 import { LevelsSkeleton } from './src/components/Skeleton';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { checkAndNotifyIfDue } from './src/notifications/reminders';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,7 +34,7 @@ const COMPLETED_LEVELS_KEY = 'dogTrainingApp:completedLevels';
 const CURRENT_POSITION_KEY = 'dogTrainingApp:currentPosition';
 
 function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
-  const { isRTL, ready: languageReady } = useLanguage();
+  const { language, isRTL, ready: languageReady } = useLanguage();
   const { ready: authReady, isPremium, isMock, user } = useAuth();
   const { theme } = useTheme();
   const LEVELS = useLevels();
@@ -81,7 +82,10 @@ function AppInner({ onLayoutRootView }: { onLayoutRootView: () => void }) {
       setProgressLoaded(true);
     }
     loadCompleted();
-    loadStreak(isMock, user?.id).then(setStreak);
+    loadStreak(isMock, user?.id).then(s => {
+      setStreak(s);
+      checkAndNotifyIfDue(s.practicedToday, language);
+    });
   }, [isMock, user?.id]);
 
   useEffect(() => {
