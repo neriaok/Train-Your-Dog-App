@@ -95,7 +95,11 @@ export default function DogProfileScreen({ onBack, onOpenJournal }: Props) {
     try {
       await saveProfile({ name: trimmed, breed: breed.trim(), photoUri, ageGroup, experience }, editingId ?? undefined);
       onBack();
-    } catch {
+    } catch (e) {
+      // Logged so a real cause (e.g. a Supabase schema/RLS error, which has
+      // nothing to do with photo size) is visible in devtools even though
+      // the user-facing message below covers the common case.
+      console.error('Dog profile save failed:', e);
       setBusy(false);
       setError(t.saveFailed);
     }

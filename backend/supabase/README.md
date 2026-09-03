@@ -25,6 +25,28 @@ like before - nothing changes on its own.
    in, and the app gains a sign up / log in screen plus level-2+ gating for
    non-premium users.
 
+## Syncing dog profiles, journal, and progress across devices
+
+`schema.sql` alone only sets up accounts/subscriptions. To also store dog
+profiles, journal entries, and level progress in Supabase instead of only
+the browser's local storage, run these files too, **in this exact order**,
+in the SQL Editor (each one only adds what the previous ones didn't have
+yet, so it's safe even if you're not sure which you've already run):
+
+1. `sync_schema.sql` - creates `dog_profiles`, `journal_entries`, `progress`
+   tables and the `media` storage bucket.
+2. `sync_schema_v2.sql` - lets a level resume where you left off.
+3. `sync_schema_v3.sql` - adds the weekly practice-streak columns.
+4. `sync_schema_v4.sql` - adds the dog's age group / experience level.
+5. `sync_schema_v5.sql` - switches `dog_profiles` to support multiple dogs
+   per account (needed for the dog switcher in the profile screen).
+6. `sync_schema_v6.sql` - adds the post-level feedback table.
+
+If saving a dog profile (or a journal entry, or progress) fails with a
+generic error, the most common cause is one of these files not having been
+run yet against your project - open the browser devtools console for the
+real Postgres error (e.g. "column ... does not exist") to confirm.
+
 ## Testing premium without real payments
 
 `is_premium` defaults to `false` for every new signup (free plan = level 1
